@@ -1,0 +1,41 @@
+@import 'tailwindcss';
+
+html {
+    @apply text-slate-200 bg-linear-to-t from-purple-600 to-40% to-indigo-500
+}
+
+body{
+    font-family: 'Zain';
+}
+
+@layer base{
+
+    button{
+        @apply bg-slate-200 text-slate-600 py-4 px-8 hover:bg-slate-300 transition rounded-full cursor-pointer text-xl;
+    }
+
+    h1 {
+        @apply text-5xl;
+    }
+
+    h2 {
+        @apply text-4xl;
+    }
+
+    h3 {
+        @apply text-3xl;
+    }
+
+    p {
+        @apply text-xl
+    }
+
+    input {
+        @apply outline-2 outline-slate-200 py-2 px-4 rounded-lg
+    }
+
+    input:focus {
+        @apply bg-slate-200/8 outline-sky-200
+    }
+
+}
