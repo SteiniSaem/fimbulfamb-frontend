@@ -1,6 +1,6 @@
 <script lang='ts'>
 	import api from '$api';
-    import {currentView, game, myUsername} from '$store';
+    import {currentView, game, myUsername, webSocket} from '$store';
 	import { onMount } from 'svelte';
 
     let hasGameStartedInterval: number;
@@ -11,12 +11,38 @@
             $currentView = 'home'
             return
         }
-        getPlayersInterval = setInterval(getPlayers, 2000)
+        $webSocket = new WebSocket(`ws://localhost:8000/game/${$game.code}/ws`);
+
+        // Event: Connection opened
+        $webSocket.onopen = (event) => {
+            console.log(`WebSocket connection to Rocket server for game ${$game.code} established`);
+        };
+
+        // Event: Listen for messages from server
+        $webSocket.onmessage = (msg) => {
+            console.log('Message from server:', msg.data);
+            if(msg.data.startsWith("New Player")) {
+                let playerName = msg.data.split('\t')[1].trim()
+                $game.players = [...$game.players, {name: playerName, points: 0}]
+            }
+            else if(msg.data.startsWith("Start Game")){
+                $game.currentPlayer = msg.data.split('\t')[1]
+
+                $currentView = 'game'
+            }
+        };
+
+        // Event: Connection closed
+        $webSocket.onclose = () => {
+            console.log('Disconnected');
+        };
+        /*getPlayersInterval = setInterval(getPlayers, 2000)
 
         if($game && $game.owner != $myUsername) { // if I am not owner
             hasGameStartedInterval = setInterval(hasGameStarted, 2000)
-        }
+        }*/
     })
+
 
     function startGame() {
         if($game){

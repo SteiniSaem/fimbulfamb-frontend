@@ -3,17 +3,15 @@
     import LoadingIndicator from "$compopnents/LoadingIndicator.svelte";
 	import { currentView, game, myUsername } from "$store"
 
-    let username = $state("")
     let code = $state('')
     let errorMessage = $state('')
     let isLoading = $state(false)
 
     async function createGame(){
-        if(username.length == 0) return
+        if($myUsername.length == 0) return
         isLoading = true;
-        await api.put(`createNewGame/${username}`).then(res => {
-            $game = {code: res.data, owner: username, players: [{name: username, points: 0}]}
-            $myUsername = username
+        await api.put(`createNewGame/${$myUsername}`).then(res => {
+            $game = {code: res.data, owner: $myUsername, players: [{name: $myUsername, points: 0}], currentPlayer: ''}
             $currentView = 'lobby'
         }).catch(err => {
             console.log(err)
@@ -22,12 +20,12 @@
     }
 
     async function joinGame(){
-        if(username.length == 0) return;
+        if($myUsername.length == 0) return;
         if(code.length == 0) return;
 
         isLoading = true;
-        await api.put(`joinGame/${code}/${username}`).then(res => {
-            $game = {code: res.data.id, owner: res.data.owner, players: res.data.players}
+        await api.put(`joinGame/${code}/${$myUsername}`).then(res => {
+            $game = {code: res.data.id, owner: res.data.owner, players: res.data.players, currentPlayer: ''}
             $currentView = 'lobby'
         }).catch(err => {
             //console.log(err.response.data)
@@ -40,7 +38,7 @@
 <div class='flex flex-col items-center p-4 h-full'>
     <h1 class='mb-12'>Fimbulfamb</h1>
 
-    <input type="text" placeholder="Nafn" bind:value={username}>
+    <input type="text" placeholder="Nafn" bind:value={$myUsername}>
     <button class='my-6' onclick={createGame}>Stofna nýjan leik</button>
 
     <div class='flex items-center mt-6'>
