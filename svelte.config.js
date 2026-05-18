@@ -15,7 +15,8 @@ const config = {
 			$views: 'src/lib/views',
 			$compopnents: 'src/lib/components',
 			$store: 'src/store',
-			$api: 'src/api'
+			$api: 'src/api',
+			$interfaces: 'src/lib/interfaces.ts',
 		}
 	}
 };
