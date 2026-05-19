@@ -9,6 +9,8 @@
 
     async function createGame(){
         if($myUsername.length == 0) return
+        $myUsername = $myUsername.trim()
+        
         isLoading = true;
         await api.put(`createNewGame/${$myUsername}`).then(res => {
             $game = {code: res.data, owner: $myUsername, players: [{name: $myUsername, points: 0}], currentPlayer: ''}
@@ -22,6 +24,7 @@
     async function joinGame(){
         if($myUsername.length == 0) return;
         if(code.length == 0) return;
+        $myUsername = $myUsername.trim()
 
         isLoading = true;
         await api.put(`joinGame/${code}/${$myUsername}`).then(res => {
