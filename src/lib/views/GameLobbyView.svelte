@@ -1,16 +1,20 @@
 <script lang='ts'>
 	import api from '$api';
-    import {currentView, game, myUsername, webSocket} from '$store';
+	import LoadingIndicator from '$compopnents/LoadingIndicator.svelte';
+    import {currentView, game, amOwner, webSocket, myUsername} from '$store';
 	import { onMount } from 'svelte';
 
-    let hasGameStartedInterval: number;
-    let getPlayersInterval: number;
+    let isLoading = $state(false)
+    let errMessage = $state('')
 
     onMount(() => {
         if(!$game){
             $currentView = 'home'
             return
         }
+        /*for(let i = 0; i < 12; i++) {
+            $game.players = [...$game.players, {name: `api${i+1}`, points: 0}]
+        }*/
         $webSocket = new WebSocket(`ws://localhost:8000/game/${$game.code}/ws`);
 
         // Event: Connection opened
@@ -19,90 +23,89 @@
         };
 
         // Event: Listen for messages from server
-        $webSocket.onmessage = (msg) => {
-            console.log('Message from server:', msg.data);
-            if(msg.data.startsWith("New Player")) {
-                let playerName = msg.data.split('\t')[1].trim()
-                $game.players = [...$game.players, {name: playerName, points: 0}]
-            }
-            else if(msg.data.startsWith("Start Game")){
-                $game.currentPlayer = msg.data.split('\t')[1]
+        $webSocket.onmessage = (event) => {
+            console.log('Message from server:', event.data);
+            let parts = event.data.split('\t');
+            console.log(parts)
+            switch (parts[0]) {
+                case "New Player":
+                    let name = parts[1].trim()
+                    $game.players = [...$game.players, {name: name, points: 0}];
+                    break;
 
-                $currentView = 'game'
+                case "Start Game":
+                    $game.currentPlayer = parts[1];
+                    $currentView = 'game';
+                    break;
+                
+                case "Quitter":
+                    let quitter = parts[1]
+                    let idx = $game.players.findIndex(p => p.name == quitter)
+                    if(idx > -1){
+                        $game.players.splice(idx, 1)
+                        $game.players = $game.players
+                    }
+                    break;
+                
+                case "New Owner":
+                    if(parts[1].trim() == $myUsername){
+                        $amOwner = true
+                    }
+                    break;
             }
-        };
+        }
 
         // Event: Connection closed
         $webSocket.onclose = () => {
             console.log('Disconnected');
         };
-        /*getPlayersInterval = setInterval(getPlayers, 2000)
-
-        if($game && $game.owner != $myUsername) { // if I am not owner
-            hasGameStartedInterval = setInterval(hasGameStarted, 2000)
-        }*/
     })
 
 
-    function startGame() {
+    async function startGame() {
         if($game){
-            api.put(`startGame/${$game.code}`).then(res => {
-                clearIntervals()
+            isLoading = true
+            errMessage = ''
+            await api.put(`startGame/${$game.code}`).then(() => {
                 $currentView = 'game'
             }).catch(err => {
-                console.log(err)
-            })
-        }
-    }
-
-    function getPlayers() {
-        if($game) {
-            api.get(`players/${$game.code}`).then(res => {
-                $game.players = res.data
-            }).catch(err => {
-                console.log(err)
-            })
-        }
-    }
-
-    function hasGameStarted(){
-        if($game) { // if I am owner
-            api.get(`hasGameStarted/${$game.code}`).then(res => {
-                if(res.data == true){
-                    clearIntervals()
-                    $currentView = "game";
+                if(err.code == "ECONNABORTED") {
+                    errMessage = "Þjónn var of lengi a svara"
+                } else {
+                    errMessage = err.response.data
                 }
-            }).catch(err => {
-                console.log(err)
             })
+            isLoading = false
         }
-    }
-
-    function clearIntervals(){
-        clearInterval(hasGameStartedInterval)
-        clearInterval(getPlayersInterval)
     }
 
 </script>
 
 {#if $game}
-    <div class='flex flex-col h-full'>
+    <div class='flex flex-col items-center w-full h-full overflow-auto'>
         <h1 class='mb-12'>Nýr Leikur</h1>
 
-        <div class='flex flex-col items-center h-full justify-between'>
-            <div class='flex flex-col items-center'>
+        <div class='flex flex-col items-center w-full h-full justify-between overflow-auto'>
+            <div class='flex flex-col h-full items-center overflow-auto'>
 
                 <p class='text-lg'>Kóði</p>
                 <h1 class='mt-2 mb-6'>{$game.code}</h1>
 
                 <p class='font-bold w-50 border-b text-center mb-2'>Leikmenn</p>
-                {#each $game.players as player}
-                    <p>{player.name}</p>
-                {/each}
+                <div class='flex flex-col items-center w-full h-full overflow-auto'>
+                    {#each $game.players as player}
+                        <p>{player.name}</p>
+                    {/each}
+                </div>
             </div>
 
-            {#if $game.owner == $myUsername}
-                <button onclick={startGame}>Hefja Leik</button>
+            <LoadingIndicator bind:isLoading/>
+
+            {#if $amOwner}
+                <div class='flex flex-col items-center mt-2 w-full'>
+                    <p class='text-amber-500 h-8'>{errMessage}</p>
+                    <button onclick={startGame}>Hefja Leik</button>
+                </div>
             {/if}
         </div>
     </div>

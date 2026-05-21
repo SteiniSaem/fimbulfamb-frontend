@@ -5,11 +5,25 @@
 	import { currentView } from "../store";
     import { Modals } from 'svelte-modals'
 	import { fade } from "svelte/transition";
+    import home from "$assets/home.png"
+	import { modals } from "svelte-modals";
+	import QuitModal from "$lib/modals/QuitModal.svelte";
+
+    async function quitMaybe() {
+        let quit = await modals.open(QuitModal);
+        if(quit){
+            $currentView = 'home'
+        }
+    }
 
 </script>
 
-<div class='w-screen h-screen flex flex-col items-center p-4'>
-
+<div class='w-screen h-screen flex flex-col items-center px-4 pb-4 pt-2'>
+    <div class='flex justify-between w-full h-6'>
+        {#if $currentView != 'home'}
+            <button class='p-0 bg-transparent' onclick={quitMaybe}><img height={20} width={20} src={home} alt="home"/></button>
+        {/if}
+    </div>
     {#if $currentView == 'home'}
         <HomeView/>
     {:else if $currentView == 'game'}

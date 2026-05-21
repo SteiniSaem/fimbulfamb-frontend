@@ -17,7 +17,8 @@ const config = {
 			$store: 'src/store',
 			$api: 'src/api',
 			$interfaces: 'src/lib/interfaces.ts',
-			$assets: "src/lib/assets"
+			$assets: "src/lib/assets",
+			$common: "src/lib/common.ts"
 		}
 	}
 };

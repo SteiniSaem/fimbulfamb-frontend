@@ -1,22 +1,28 @@
 <script lang='ts'>
 	import api from "$api";
     import LoadingIndicator from "$compopnents/LoadingIndicator.svelte";
-	import { currentView, game, myUsername } from "$store"
+	import { currentView, game, myUsername, amOwner } from "$store"
 
     let code = $state('')
-    let errorMessage = $state('')
+    let errMessage = $state('')
     let isLoading = $state(false)
 
     async function createGame(){
         if($myUsername.length == 0) return
         $myUsername = $myUsername.trim()
-        
+
         isLoading = true;
+        errMessage = ''
         await api.put(`createNewGame/${$myUsername}`).then(res => {
-            $game = {code: res.data, owner: $myUsername, players: [{name: $myUsername, points: 0}], currentPlayer: ''}
+            $game = {code: res.data, players: [{name: $myUsername, points: 0}], currentPlayer: ''}
+            $amOwner = true
             $currentView = 'lobby'
         }).catch(err => {
-            console.log(err)
+            if(err.code == "ECONNABORTED") {
+                errMessage = "Þjónn var of lengi a svara"
+            } else {
+                errMessage = err.response.data
+            }
         })
         isLoading = false;
     }
@@ -27,12 +33,16 @@
         $myUsername = $myUsername.trim()
 
         isLoading = true;
-        await api.put(`joinGame/${code}/${$myUsername}`).then(res => {
-            $game = {code: res.data.id, owner: res.data.owner, players: res.data.players, currentPlayer: ''}
+        errMessage = ''
+        await api.put(`joinGame/${code}`, {username: $myUsername}).then(res => {
+            $game = {code: res.data.id, players: res.data.players, currentPlayer: ''}
             $currentView = 'lobby'
         }).catch(err => {
-            //console.log(err.response.data)
-            errorMessage = err.response.data
+            if(err.code == "ECONNABORTED") {
+                errMessage = "Þjónn var of lengi a svara"
+            } else {
+                errMessage = err.response.data
+            }
         })
         isLoading = false;
     }
@@ -48,6 +58,6 @@
         <input class='mr-4 w-30' maxlength="6" type="text" placeholder="Kóði" bind:value={code} oninput={() => code = code.toUpperCase()}>
         <button class='py-0 h-12' onclick={joinGame}>Joina leik</button>
     </div>
-    <p class='text-rose-600 mt-6'>{errorMessage}</p>
+    <p class='text-rose-600 mt-6'>{errMessage}</p>
     <LoadingIndicator bind:isLoading/>
 </div>

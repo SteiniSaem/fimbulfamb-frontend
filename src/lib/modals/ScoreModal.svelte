@@ -5,6 +5,7 @@
     import type { Player } from '$interfaces'
 	import { onMount } from "svelte";
 	import api from "$api";
+	import LoadingIndicator from "$compopnents/LoadingIndicator.svelte";
 
     type closeValue = Player[]|null
 
@@ -24,13 +25,15 @@
 
     async function save() {
         isLoading = true
+        errMessage = ''
         await api.put(`updateScores/${gameCode}`, {players: players}).then(() => {
-            console.log("PLAYERS FROM MODAL")
-            console.log($state.snapshot(players))
             close(players)
         }).catch(err => {
-            console.log(err.response)
-            errMessage = err.response.data
+            if(err.code == "ECONNABORTED") {
+                errMessage = "Þjónn var of lengi a svara"
+            } else {
+                errMessage = err.response.data
+            }
         }) 
         isLoading = false    
     }
@@ -40,20 +43,26 @@
 {#if isOpen}
 <div role="dialog" class="modal">
     <div class="contents rounded-2xl text-slate-700" transition:fade|global={{duration: 150}}>
-        <p class='font-semibold border-b border-slate-400/60 w-full pb-2'>Stigatafla</p>
+        <!--<p class='font-semibold border-b border-slate-400/60 w-full pb-2'>Stigatafla</p>-->
         <div class='w-full'>
-            {#each players as player, i}
-            <div class='flex justify-between w-full my-2'>
-                <p>{player.name}</p>
-                <div class='flex select-none'>
-                    <button class="bg-transparent p-0 text-xl" onclick={() => {players[i].points -= 1}}>-</button>
-                    <p class='w-12 text-center'>{player.points}</p>
-                    <button class='bg-transparent p-0 text-xl' onclick={() => {players[i].points += 1}}>+</button>
+            {#if !isLoading}
+                {#each players as player, i}
+                <div class='flex justify-between w-full my-2'>
+                    <p>{player.name}</p>
+                    <div class='flex select-none'>
+                        <button class="bg-transparent p-0 text-xl" onclick={() => {players[i].points -= 1}}>-</button>
+                        <p class='w-12 text-center'>{player.points}</p>
+                        <button class='bg-transparent p-0 text-xl' onclick={() => {players[i].points += 1}}>+</button>
+                    </div>
                 </div>
-            </div>
-            {/each }
+                {/each}
+            {:else}
+                <div class='w-full h-full flex justify-center items-center'>
+                    <LoadingIndicator bind:isLoading/>
+                </div>
+            {/if}
         </div>
-        <p class='mt-2 text-rose-500'>{errMessage}</p>
+        <p class='h-8 text-rose-500'>{errMessage}</p>
         <div class="flex justify-between w-full border-t border-slate-400/60 pt-2">
             <button class='bg-rose-600 text-white text-sm' onclick={() => close(null)}>Hætta við</button>
             <button class='bg-emerald-500 text-white text-sm' onclick={save}>Vista</button>
