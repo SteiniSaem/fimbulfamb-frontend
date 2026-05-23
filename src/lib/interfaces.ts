@@ -10,6 +10,7 @@ export interface Player {
 
 export interface Game {
     code: string,
+    owner: string,
     players: Player[],
     currentPlayer: string,
 }

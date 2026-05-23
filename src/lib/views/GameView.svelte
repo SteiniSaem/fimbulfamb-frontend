@@ -1,7 +1,7 @@
 <script lang='ts'>
     import { flip } from 'svelte/animate';
 	import api from "$api";
-	import { game, myUsername, webSocket, amOwner } from "$store";
+	import { game, myUsername, webSocket } from "$store";
 	import { onMount } from "svelte";
     import type { Word } from "$interfaces";
 	import { slide } from "svelte/transition";
@@ -73,9 +73,7 @@
                         break;
                     
                     case "New Owner":
-                        if(parts[1].trim() == $myUsername){
-                            $amOwner = true
-                        }
+                        $game.owner = parts[1].trim()
                         break;
                     }
                 
@@ -121,6 +119,7 @@
                 if(err.code == "ECONNABORTED") {
                     errMessage = "Þjónn var of lengi a svara"
                 } else {
+                    console.log(err.response)
                     errMessage = err.response.data
                 }
             })
@@ -284,7 +283,7 @@
 
         {:else}
             <div class='flex flex-col h-full overflow-auto justify-between'>
-                <div class='flex flex-col items-center text-md min-h-16 border'>
+                <div class='flex flex-col items-center text-md min-h-16'>
                     {#if word.definition}
                         <p class='border-b border-slate-200/50 pb-1 px-12 text-md'>Mín skýring</p>
                     {/if}

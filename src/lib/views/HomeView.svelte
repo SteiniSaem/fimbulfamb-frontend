@@ -1,7 +1,7 @@
 <script lang='ts'>
 	import api from "$api";
     import LoadingIndicator from "$compopnents/LoadingIndicator.svelte";
-	import { currentView, game, myUsername, amOwner } from "$store"
+	import { currentView, game, myUsername } from "$store"
 
     let code = $state('')
     let errMessage = $state('')
@@ -14,8 +14,7 @@
         isLoading = true;
         errMessage = ''
         await api.put(`createNewGame/${$myUsername}`).then(res => {
-            $game = {code: res.data, players: [{name: $myUsername, points: 0}], currentPlayer: ''}
-            $amOwner = true
+            $game = {code: res.data, owner: $myUsername, players: [{name: $myUsername, points: 0}], currentPlayer: ''}
             $currentView = 'lobby'
         }).catch(err => {
             if(err.code == "ECONNABORTED") {
@@ -35,7 +34,7 @@
         isLoading = true;
         errMessage = ''
         await api.put(`joinGame/${code}`, {username: $myUsername}).then(res => {
-            $game = {code: res.data.id, players: res.data.players, currentPlayer: ''}
+            $game = {code: res.data.id, owner: res.data.owner,  players: res.data.players, currentPlayer: ''}
             $currentView = 'lobby'
         }).catch(err => {
             if(err.code == "ECONNABORTED") {
@@ -58,6 +57,6 @@
         <input class='mr-4 w-30' maxlength="6" type="text" placeholder="Kóði" bind:value={code} oninput={() => code = code.toUpperCase()}>
         <button class='py-0 h-12' onclick={joinGame}>Joina leik</button>
     </div>
-    <p class='text-rose-600 mt-6'>{errMessage}</p>
+    <p class='text-amber-500 mt-6'>{errMessage}</p>
     <LoadingIndicator bind:isLoading/>
 </div>

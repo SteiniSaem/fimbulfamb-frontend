@@ -1,7 +1,8 @@
 <script lang='ts'>
 	import api from '$api';
+    import { WS_URL } from '$api';
 	import LoadingIndicator from '$compopnents/LoadingIndicator.svelte';
-    import {currentView, game, amOwner, webSocket, myUsername} from '$store';
+    import {currentView, game, webSocket, myUsername} from '$store';
 	import { onMount } from 'svelte';
 
     let isLoading = $state(false)
@@ -15,7 +16,7 @@
         /*for(let i = 0; i < 12; i++) {
             $game.players = [...$game.players, {name: `api${i+1}`, points: 0}]
         }*/
-        $webSocket = new WebSocket(`ws://localhost:8000/game/${$game.code}/ws`);
+        $webSocket = new WebSocket(`${WS_URL}/game/${$game.code}/ws`);
 
         // Event: Connection opened
         $webSocket.onopen = (event) => {
@@ -48,9 +49,7 @@
                     break;
                 
                 case "New Owner":
-                    if(parts[1].trim() == $myUsername){
-                        $amOwner = true
-                    }
+                    $game.owner = parts[1].trim()
                     break;
             }
         }
@@ -101,7 +100,7 @@
 
             <LoadingIndicator bind:isLoading/>
 
-            {#if $amOwner}
+            {#if $game.owner == $myUsername}
                 <div class='flex flex-col items-center mt-2 w-full'>
                     <p class='text-amber-500 h-8'>{errMessage}</p>
                     <button onclick={startGame}>Hefja Leik</button>
