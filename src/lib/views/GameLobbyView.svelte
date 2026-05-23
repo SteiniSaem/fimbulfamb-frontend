@@ -1,6 +1,6 @@
 <script lang='ts'>
 	import api from '$api';
-    import { WS_URL } from '$api';
+    import { PUBLIC_WS_URL } from '$env/static/public';
 	import LoadingIndicator from '$compopnents/LoadingIndicator.svelte';
     import {currentView, game, webSocket, myUsername} from '$store';
 	import { onMount } from 'svelte';
@@ -16,7 +16,7 @@
         /*for(let i = 0; i < 12; i++) {
             $game.players = [...$game.players, {name: `api${i+1}`, points: 0}]
         }*/
-        $webSocket = new WebSocket(`${WS_URL}/game/${$game.code}/ws`);
+        $webSocket = new WebSocket(`${PUBLIC_WS_URL}/game/${$game.code}/ws`);
 
         // Event: Connection opened
         $webSocket.onopen = (event) => {

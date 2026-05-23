@@ -1,12 +1,14 @@
 <script lang='ts'>
-	import api from "$api";
+    import { PUBLIC_WS_URL } from "$env/static/public";
+    import api from "$api";
     import LoadingIndicator from "$compopnents/LoadingIndicator.svelte";
 	import { currentView, game, myUsername } from "$store"
+	import { onMount } from "svelte";
 
     let code = $state('')
     let errMessage = $state('')
     let isLoading = $state(false)
-
+    
     async function createGame(){
         if($myUsername.length == 0) return
         $myUsername = $myUsername.trim()

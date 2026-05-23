@@ -1,10 +1,11 @@
+import { PUBLIC_API_URL } from '$env/static/public';
 import axios from 'axios';
 
-export const WS_URL = "ws://localhost:8000"
+//export const WS_URL = "ws://localhost:8000"
 //export const WS_URL = "ws://192.168.3.42:8000"
 
 const api = axios.create({
-    baseURL: "http://localhost:8000/",
+    baseURL: PUBLIC_API_URL,
     //baseURL: "http://192.168.3.42:8000",
     timeout: 5000
 });
