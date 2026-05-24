@@ -4,13 +4,13 @@ export interface Word {
 }
 
 export interface Player {
-    name: string,
-    points: number
+    name: string;
+    points: number;
 }
 
-export interface Game {
-    code: string,
-    owner: string,
-    players: Player[],
-    currentPlayer: string,
+
+
+export interface Definition {
+    player: string;
+    definition: string;
 }

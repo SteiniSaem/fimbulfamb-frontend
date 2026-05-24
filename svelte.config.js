@@ -18,7 +18,8 @@ const config = {
 			$api: 'src/api',
 			$interfaces: 'src/lib/interfaces.ts',
 			$assets: "src/lib/assets",
-			$common: "src/lib/common.ts"
+			$common: "src/lib/common.ts",
+			$classes: "src/lib/Classes"
 		}
 	}
 };

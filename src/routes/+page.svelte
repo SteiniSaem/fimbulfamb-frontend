@@ -2,7 +2,7 @@
 	import HomeView from "$views/HomeView.svelte";
     import GameView from "$views/GameView.svelte";
 	import GameLobbyView from "$views/GameLobbyView.svelte";
-	import { currentView, game, myUsername, webSocket } from "../store";
+	import { currentView, game, myUsername, webSocket, webSocketShouldBeClosed } from "../store";
     import { Modals } from 'svelte-modals'
 	import { fade } from "svelte/transition";
     import home from "$assets/home.png"
@@ -13,6 +13,7 @@
     async function quitMaybe() {
         let quit = await modals.open(QuitModal);
         if(quit){
+            $webSocketShouldBeClosed = true;
             $webSocket?.close()
             $currentView = 'home'
         }

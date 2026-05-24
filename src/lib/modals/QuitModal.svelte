@@ -11,7 +11,6 @@
         quit: boolean
     }
 
-
     let {isOpen, close }: MyModalProps = $props() 
     let isLoading = $state(false)
     let errMessage = $state("")

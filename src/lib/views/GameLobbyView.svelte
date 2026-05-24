@@ -2,79 +2,39 @@
 	import api from '$api';
     import { PUBLIC_WS_URL } from '$env/static/public';
 	import LoadingIndicator from '$compopnents/LoadingIndicator.svelte';
-    import {currentView, game, webSocket, myUsername} from '$store';
+    import {currentView, game, webSocket, myUsername, errMessage, isLoading} from '$store';
+    import { setupWebsocketConnection } from '$lib/websocket';
 	import { onMount } from 'svelte';
 
-    let isLoading = $state(false)
-    let errMessage = $state('')
 
     onMount(() => {
         if(!$game){
             $currentView = 'home'
             return
         }
+        $errMessage = ''
         /*for(let i = 0; i < 12; i++) {
             $game.players = [...$game.players, {name: `api${i+1}`, points: 0}]
         }*/
-        $webSocket = new WebSocket(`${PUBLIC_WS_URL}/game/${$game.code}/ws`);
-
-        // Event: Connection opened
-        $webSocket.onopen = (event) => {
-            console.log(`WebSocket connection to Rocket server for game ${$game.code} established`);
-        };
-
-        // Event: Listen for messages from server
-        $webSocket.onmessage = (event) => {
-            console.log('Message from server:', event.data);
-            let parts = event.data.split('\t');
-            console.log(parts)
-            switch (parts[0]) {
-                case "New Player":
-                    let name = parts[1].trim()
-                    $game.players = [...$game.players, {name: name, points: 0}];
-                    break;
-
-                case "Start Game":
-                    $game.currentPlayer = parts[1];
-                    $currentView = 'game';
-                    break;
-                
-                case "Quitter":
-                    let quitter = parts[1]
-                    let idx = $game.players.findIndex(p => p.name == quitter)
-                    if(idx > -1){
-                        $game.players.splice(idx, 1)
-                        $game.players = $game.players
-                    }
-                    break;
-                
-                case "New Owner":
-                    $game.owner = parts[1].trim()
-                    break;
-            }
-        }
-
-        // Event: Connection closed
-        $webSocket.onclose = () => {
-            console.log('Disconnected');
-        };
+        $webSocket = setupWebsocketConnection()
     })
+        
 
 
     async function startGame() {
         if($game){
-            isLoading = true
-            errMessage = ''
+            $isLoading = true
+            $errMessage = ''
             await api.put(`startGame/${$game.code}`).then(() => {
                 $currentView = 'game'
             }).catch(err => {
                 if(err.code == "ECONNABORTED") {
-                    errMessage = "Þjónn var of lengi a svara"
+                    $errMessage = "Þjónn var of lengi a svara"
                 } else {
-                    errMessage = err.response.data
+                    $errMessage = err.response.data
                 }
             })
-            isLoading = false
+            $isLoading = false
         }
     }
 
@@ -98,11 +58,11 @@
                 </div>
             </div>
 
-            <LoadingIndicator bind:isLoading/>
+            <LoadingIndicator bind:isLoading={$isLoading}/>
 
             {#if $game.owner == $myUsername}
                 <div class='flex flex-col items-center mt-2 w-full'>
-                    <p class='text-amber-500 h-8'>{errMessage}</p>
+                    <p class='text-amber-500 h-8'>{$errMessage}</p>
                     <button onclick={startGame}>Hefja Leik</button>
                 </div>
             {/if}

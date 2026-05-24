@@ -16,35 +16,14 @@
     let isLoading = $state(false)
     let errMessage = $state("")
 
-    async function quit() {
-        if($game) {
-            isLoading = true
-            errMessage = ''
-            await api.put(`leaveGame/${$game.code}`, {name: $myUsername}).then(() => {
-                close(true)
-            }).catch(err => {
-                if(err.code == "ECONNABORTED") {
-                    errMessage = "Þjónn var of lengi a svara"
-                } else {
-                    errMessage = err.response.data
-                }
-            }) 
-            isLoading = false    
-        }
-    }
-
+    
 </script>
 
 {#if isOpen}
 <div role="dialog" class="modal">
     <div class="pointer-events-auto bg-slate-200 rounded-2xl text-slate-700 p-4" transition:fade|global={{duration: 150}}>
         {#if !isLoading}
-            <p class='mb-4'>Yfirgefa leik?</p>
-            <p class='text-rose-600 mb-4'>{errMessage}</p>
-            <div class='flex'>
-                <button class='bg-emerald-500 text-white mr-4' onclick={() => close(false)}>Nei, halda áfram</button>
-                <button class='bg-rose-600 text-white' onclick={quit}>Já, Yfirgefa leik</button>
-            </div>
+            <p>Penis</p>
         {:else}
             <LoadingIndicator bind:isLoading/>
         {/if}
