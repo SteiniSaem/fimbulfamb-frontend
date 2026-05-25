@@ -1,16 +1,15 @@
 import { PUBLIC_WS_URL } from "$env/static/public";
-import { currentView, game, myUsername, openForSubmissions, webSocketShouldBeClosed } from "$store";
+import { currentView, game, myUsername, openForSubmissions, webSocket, webSocketShouldBeClosed } from "$store";
 import { get } from "svelte/store";
 import { getWord } from "$common";
-let ws;
+let ws: WebSocket;
 
 
 export function setupWebsocketConnection(){
     let g = get(game)
-    if (!g) return
+    if (!g) return null
 
     ws = new WebSocket(`${PUBLIC_WS_URL}/game/${g.code}/ws`);
-    if(!ws) return
     
     webSocketShouldBeClosed.set(false)
 
@@ -33,15 +32,6 @@ export function setupWebsocketConnection(){
                 case "Start Game":
                     g.currentPlayer = parts[1];
                     currentView.set('game');
-                    break;
-                
-                case "Quitter":
-                    let quitter = parts[1]
-                    let idx = g.players.findIndex(p => p.name == quitter)
-                    if(idx > -1){
-                        g.players.splice(idx, 1)
-                        g.players = g.players
-                    }
                     break;
                 
                 case "New Owner":
@@ -76,11 +66,19 @@ export function setupWebsocketConnection(){
                     break;
                 
                 case "Quitter":
-                    quitter = parts[1]
-                    idx = g.players.findIndex(p => p.name == quitter)
+                    let quitter = parts[1].trim()
+                    let idx = g.players.findIndex(p => p.name == quitter)
                     if(idx > -1){
                         g.players.splice(idx, 1)
                         g.players = g.players
+                    }
+                    idx = g.definitions.findIndex(d => d.player == quitter) // remove players definition if exists
+                    if(idx > -1) g.definitions.splice(idx, 1)
+
+                    if(quitter == get(myUsername)){ // ef ég er rekinn úr leik (send sama requesta og þegar er leavað)
+                        webSocketShouldBeClosed.set(true)
+                        currentView.set("home")
+                        ws.close()
                     }
                     break;
             }

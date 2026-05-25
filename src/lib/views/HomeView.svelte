@@ -2,10 +2,19 @@
     import api from "$api";
 	import { Game } from "$classes/Game";
     import LoadingIndicator from "$compopnents/LoadingIndicator.svelte";
-	import { currentView, game, myUsername, errMessage, webSocketShouldBeClosed } from "$store"
+	import { currentView, game, myUsername, errMessage, webSocket, webSocketShouldBeClosed } from "$store"
+	import { onMount } from "svelte";
+    import { setupWebsocketConnection } from '$lib/websocket';
 
     let code = $state('')
     let isLoading = $state(false)
+
+    onMount(() => {
+        if($webSocket && $webSocket.readyState == $webSocket.OPEN) { // if websocket is open for some reason while in the homeView, close it
+            $webSocketShouldBeClosed = true
+            $webSocket.close()
+        }
+    })
 
     async function createGame(){
         if($myUsername.length == 0) return
@@ -14,8 +23,10 @@
         isLoading = true;
         $errMessage = ''
         await api.put(`createNewGame/${$myUsername}`).then(res => {
-            $game = new Game(res.data, $myUsername, [{name: $myUsername, points: 0}], $myUsername, [], {word: '', definition: ''});
+            $game = new Game(res.data, $myUsername, [{name: $myUsername, points: 0}], $myUsername, [], {word: '', definition: ''}, true, false);
             $webSocketShouldBeClosed = false
+            $webSocket = setupWebsocketConnection()
+
             $currentView = 'lobby'
         }).catch(err => {
             if(err.code == "ECONNABORTED") {
@@ -35,9 +46,11 @@
         isLoading = true;
         $errMessage = ''
         await api.put(`joinGame/${code}`, {username: $myUsername}).then(res => {
-            $game = new Game(res.data.id, res.data.owner, res.data.players, res.data.current_player, res.data.player_definitions, res.data.current_word)
+            $game = new Game(res.data.id, res.data.owner, res.data.players, res.data.current_player, res.data.player_definitions, res.data.current_word, res.data.joinable, res.data.has_started)
             $webSocketShouldBeClosed = false
-            $currentView = 'lobby'
+            $webSocket = setupWebsocketConnection()
+            
+            $currentView = $game.hasStarted ? 'game' : 'lobby'
         }).catch(err => {
             if(err.code == "ECONNABORTED") {
                 $errMessage = "Þjónn var of lengi a svara"
@@ -52,7 +65,7 @@
 <div class='flex flex-col items-center p-4 h-full'>
     <h1 class='mb-12'>Fimbulfamb</h1>
 
-    <input type="text" placeholder="Nafn" bind:value={$myUsername}>
+    <input type="text" placeholder="Nafn" maxlength="10" bind:value={$myUsername}>
     <button class='my-6' onclick={createGame}>Stofna nýjan leik</button>
 
     <div class='flex items-center mt-6'>

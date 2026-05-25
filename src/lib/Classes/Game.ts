@@ -8,14 +8,18 @@ export class Game {
     currentPlayer: string
     definitions: Definition[]
     currentWord: Word
+    joinable: boolean
+    hasStarted: boolean
 
-    public constructor(code: string, owner: string, players: Player[], currentPlayer: string, definitions: Definition[], currentWord: Word) {
+    public constructor(code: string, owner: string, players: Player[], currentPlayer: string, definitions: Definition[], currentWord: Word, joinable: boolean, hasStarted: boolean) {
         this.code = code
         this.owner = owner
         this.players = players
         this.currentPlayer = currentPlayer
         this.definitions = definitions
         this.currentWord = currentWord
+        this.joinable = joinable
+        this.hasStarted = hasStarted
     }
 
     public addNewPlayerDefinition(player: string, definition: string) {

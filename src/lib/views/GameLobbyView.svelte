@@ -3,7 +3,6 @@
     import { PUBLIC_WS_URL } from '$env/static/public';
 	import LoadingIndicator from '$compopnents/LoadingIndicator.svelte';
     import {currentView, game, webSocket, myUsername, errMessage, isLoading} from '$store';
-    import { setupWebsocketConnection } from '$lib/websocket';
 	import { onMount } from 'svelte';
 
 
@@ -16,7 +15,6 @@
         /*for(let i = 0; i < 12; i++) {
             $game.players = [...$game.players, {name: `api${i+1}`, points: 0}]
         }*/
-        $webSocket = setupWebsocketConnection()
     })
         
 
@@ -26,6 +24,8 @@
             $isLoading = true
             $errMessage = ''
             await api.put(`startGame/${$game.code}`).then(() => {
+                $game.joinable = false
+                $game.hasStarted = true
                 $currentView = 'game'
             }).catch(err => {
                 if(err.code == "ECONNABORTED") {

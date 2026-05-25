@@ -1,7 +1,7 @@
 <script lang='ts'>
     import { flip } from 'svelte/animate';
 	import api from "$api";
-	import { errMessage, game, myUsername, openForSubmissions, isLoading } from "$store";
+	import { errMessage, game, myUsername, openForSubmissions, isLoading, webSocket } from "$store";
 	import { onMount } from "svelte";
 	import { slide } from "svelte/transition";
     import { modals } from 'svelte-modals'
@@ -170,7 +170,7 @@
 
 {#if $game}
     <div class='h-full w-full flex flex-col items-center overflow-auto'>
-        <div class='flex flex-col items-center mb-2'>
+        <div class='flex flex-col items-center mb-4'>
             <h3 class=''>{$game.currentWord.word}</h3>
             <!--<p class='text-center text-lg min-h-8'>{$game.currentWord.definition}</p>-->
         </div>
@@ -179,7 +179,7 @@
 
             <div class='h-full w-full flex flex-col justify-between items-center overflow-auto'>
                 <div class='w-full flex flex-col items-center overflow-auto'>
-                <button onclick={getNewWord} class='w-40'>Nýtt Orð</button>
+                <button onclick={getNewWord} class='bg-amber-500 text-sm px-8'>Nýtt Orð</button>
 
                     <!-- Player definitions -->
                     <div class='h-full w-full flex items-center flex-col overflow-auto my-4'>

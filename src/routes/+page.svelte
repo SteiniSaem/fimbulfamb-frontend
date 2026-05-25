@@ -9,6 +9,7 @@
     import settings from "$assets/settings.png"
 	import { modals } from "svelte-modals";
 	import QuitModal from "$lib/modals/QuitModal.svelte";
+    import SettingsModal from "$lib/modals/SettingsModal.svelte";
 
     async function quitMaybe() {
         let quit = await modals.open(QuitModal);
@@ -25,9 +26,9 @@
     <div class='flex justify-between w-full h-6'>
         {#if $currentView != 'home'}
             <button class='p-0 bg-transparent' onclick={quitMaybe}><img height={20} width={20} src={home} alt="home"/></button>
-            <!--{#if $game && $game.owner == $myUsername}
-                <button class='p-0 bg-transparent' onclick={() => )}><img height={20} width={20} src={settings} alt="Settings"/></button>
-            {/if}-->
+            {#if $game && $game.owner == $myUsername}
+                <button class='p-0 bg-transparent' onclick={() => modals.open(SettingsModal)}><img height={20} width={20} src={settings} alt="Settings"/></button>
+            {/if}
         {/if}
     </div>
     {#if $currentView == 'home'}
