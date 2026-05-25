@@ -6,6 +6,11 @@ html {
 
 body{
     font-family: 'Zain';
+    height: 100dvh;
+    margin: 0;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
 }
 
 @layer base{
