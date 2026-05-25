@@ -26,7 +26,8 @@ export function setupWebsocketConnection(){
             switch (parts[0]) {
                 case "New Player":
                     let name = parts[1].trim()
-                    g.players = [...g.players, {name: name, points: 0}];
+                    let p = g.players.find(p => p.name == name) // in case the player already exists
+                    if(!p) g.players = [...g.players, {name: name, points: 0}];
                     break;
 
                 case "Start Game":
