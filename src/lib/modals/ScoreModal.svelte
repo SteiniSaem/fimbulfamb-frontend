@@ -42,19 +42,19 @@
 
 {#if isOpen}
 <div role="dialog" class="modal">
-    <div class="contents rounded-2xl text-slate-700" transition:fade|global={{duration: 150}}>
+    <div class="contents rounded-2xl text-slate-700 max-h-2/3 overflow-auto" transition:fade|global={{duration: 150}}>
         <!--<p class='font-semibold border-b border-slate-400/60 w-full pb-2'>Stigatafla</p>-->
-        <div class='w-full'>
+        <div class='w-full overflow-auto'>
             {#if !isLoading}
                 {#each players as player, i}
-                <div class='flex justify-between w-full my-2'>
-                    <p>{player.name}</p>
-                    <div class='flex select-none'>
-                        <button class="bg-transparent p-0 text-xl" onclick={() => {players[i].points -= 1}}>-</button>
-                        <p class='w-12 text-center'>{player.points}</p>
-                        <button class='bg-transparent p-0 text-xl' onclick={() => {players[i].points += 1}}>+</button>
+                    <div class='flex justify-between items-center w-full my-2'>
+                        <p>{player.name}</p>
+                        <div class='flex items-center select-none'>
+                            <button class="p-0 h-8 w-8 bg-slate-300 hover:bg-slate-400 text-xl" onclick={() => {players[i].points -= 1}}>-</button>
+                            <p class='w-12 text-center'>{player.points}</p>
+                            <button class='p-0 h-8 w-8 bg-slate-300 hover:bg-slate-400 text-xl' onclick={() => {players[i].points += 1}}>+</button>
+                        </div>
                     </div>
-                </div>
                 {/each}
             {:else}
                 <div class='w-full h-full flex justify-center items-center'>

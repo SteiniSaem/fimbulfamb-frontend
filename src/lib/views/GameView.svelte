@@ -172,7 +172,7 @@
 
             <div class='h-full w-full flex flex-col justify-between items-center overflow-auto'>
                 <div class='w-full flex flex-col items-center overflow-auto'>
-                <button onclick={getNewWord} class='bg-amber-500 text-sm px-8'>Nýtt Orð</button>
+                <button onclick={getNewWord} class='bg-pink-300 hover:brightness-90 text-sm px-8'>Nýtt Orð</button>
 
                     <!-- Player definitions -->
                     <div class='h-full w-full flex items-center flex-col overflow-auto my-4'>
