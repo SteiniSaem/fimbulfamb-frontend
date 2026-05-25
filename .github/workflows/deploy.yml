@@ -15,3 +15,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Restart service
+        run: sudo systemctl restart fimbulfamb_frontend
