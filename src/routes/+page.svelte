@@ -23,7 +23,7 @@
 
 </script>
 
-<div class='w-screen h-screen flex flex-col items-center px-4 pb-4 pt-2'>
+<div class='w-full h-full flex flex-col items-center px-4 pb-4 pt-2'>
     <div class='flex justify-between w-full h-6'>
         {#if $currentView != 'home'}
             <button class='p-0 bg-transparent' onclick={quitMaybe}><img height={20} width={20} src={home} alt="home"/></button>
