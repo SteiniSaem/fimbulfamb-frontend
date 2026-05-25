@@ -1,7 +1,8 @@
 import { PUBLIC_WS_URL } from "$env/static/public";
-import { currentView, game, myUsername, openForSubmissions, webSocket, webSocketShouldBeClosed } from "$store";
+import { currentView, game, myUsername, webSocketShouldBeClosed, isLoading, errMessage } from "$store";
 import { get } from "svelte/store";
-import { getWord } from "$common";
+import api from "$api";
+
 let ws: WebSocket;
 
 
@@ -32,6 +33,9 @@ export function setupWebsocketConnection(){
 
                 case "Start Game":
                     g.currentPlayer = parts[1];
+                    if(g.currentPlayer == get(myUsername)){
+                        getWord()
+                    }
                     currentView.set('game');
                     break;
                 
@@ -42,7 +46,7 @@ export function setupWebsocketConnection(){
                 case "Next Round":
                     g.definitions = []
                     g.currentPlayer = parts[1].trim()
-                    openForSubmissions.set(true)
+                    g.openForSubmissions =true
                     if(g.currentPlayer == get(myUsername)){
                         getWord()
                     }
@@ -76,8 +80,9 @@ export function setupWebsocketConnection(){
                     idx = g.definitions.findIndex(d => d.player == quitter) // remove players definition if exists
                     if(idx > -1) g.definitions.splice(idx, 1)
 
-                    if(quitter == get(myUsername)){ // ef ég er rekinn úr leik (send sama requesta og þegar er leavað)
+                    if(quitter == get(myUsername)){ // If I'm kicked out the game (same request as leaving)
                         webSocketShouldBeClosed.set(true)
+                        game.set(null)
                         currentView.set("home")
                         ws.close()
                     }
@@ -94,6 +99,31 @@ export function setupWebsocketConnection(){
             }
         };
     return ws;
+}
+
+async function getWord() {
+    let g = get(game)
+    if(g) {
+
+        isLoading.set(true)
+        errMessage.set('')
+
+        await api.get(`currentWord/${g.code}`).then(res => {
+            g.currentWord.word = res.data.word;
+            g.currentWord.definition = res.data.definition;
+            g.definitions = [{player: get(myUsername), definition: g.currentWord.definition}]//, {player: 'api', definition: "makalaus"}, {player: 'api1', definition: "makalaus"}, {player: 'api2', definition: "makalaus"}, {player: 'api3', definition: "makalaus"}, {player: 'api4', definition: "makalaus"}, {player: 'api5', definition: "makalaus"}, {player: 'api6', definition: "makalaus"}]
+        }).catch(err => {
+            if(err.code == "ECONNABORTED") {
+                errMessage.set("Þjónn var of lengi a svara")
+            } else {
+                errMessage.set(err.response.data)
+            }
+        })
+
+        game.set(g)
+        isLoading.set(false)
+    }
+
 }
 
 

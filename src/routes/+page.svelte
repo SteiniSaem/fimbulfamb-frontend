@@ -16,6 +16,7 @@
         if(quit){
             $webSocketShouldBeClosed = true;
             $webSocket?.close()
+            $game = null;
             $currentView = 'home'
         }
     }

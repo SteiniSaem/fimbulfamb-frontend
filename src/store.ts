@@ -1,11 +1,29 @@
 import { writable } from "svelte/store";
-import type { Player} from '$interfaces';
-import type { Game } from '$classes/Game'
+import { Game } from '$classes/Game'
+
+export function persistentStore<T>(key: string, initialValue: T, reviver?: (data: any) => T) {
+    const stored = localStorage.getItem(key);
+    let data: T = initialValue;
+    if (stored) {
+        const parsed = JSON.parse(stored);
+        data = reviver ? reviver(parsed) : parsed;
+    }
+
+    const store = writable<T>(data);
+
+    store.subscribe(value => {
+        localStorage.setItem(key, JSON.stringify(value));
+    });
+
+    return store;
+}
 
 
-export const currentView = writable<"home"|"game"|"lobby">("home");
-export const game = writable<Game|null>(null);
-export const myUsername = writable("");
+export const currentView = persistentStore<"home"|"game"|"lobby">("currentView", "home");
+export const game = persistentStore<Game | null>('game', null, 
+    data => data ? Game.fromJSON(data) : null
+);
+export const myUsername = persistentStore<string>("myUsername", "");
 export const webSocket = writable<WebSocket|null>(null);
 export const errMessage = writable("");
 export const isLoading = writable(false);

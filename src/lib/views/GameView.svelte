@@ -1,7 +1,7 @@
 <script lang='ts'>
     import { flip } from 'svelte/animate';
 	import api from "$api";
-	import { errMessage, game, myUsername, openForSubmissions, isLoading, webSocket } from "$store";
+	import { errMessage, game, myUsername, isLoading, webSocket } from "$store";
 	import { onMount } from "svelte";
 	import { slide } from "svelte/transition";
     import { modals } from 'svelte-modals'
@@ -10,21 +10,26 @@
     import padlock from "$assets/padlock.png"
     import openPadlock from "$assets/open-padlock.png"
     import LoadingIndicator from '$compopnents/LoadingIndicator.svelte';
-    import { compareArrays, getWord } from '$common';
+    import { compareArrays } from '$common';
+	import { setupWebsocketConnection } from '$lib/websocket';
 
     let myDefinition = $state("")
+    let submittedDefinition = $state("")
 
     onMount(() => {
-        if(!$game) return
+        if($game){
+            $errMessage = ''
+            if(!$webSocket || $webSocket.readyState == $webSocket.CLOSED){
+                setupWebsocketConnection()
+            }
+        }
 
-        $errMessage = ''
-
-        if($game.currentPlayer == $myUsername){ // if its your turn, get the word
+        /*if($game.currentPlayer == $myUsername){ // if its your turn, get the word
             getWord();
         }
         else {
             $game.currentWord = {word: `${$game.currentPlayer} á leik`, definition: ''}
-        }
+        }*/
 
        
         
@@ -38,7 +43,7 @@
                 $game.currentWord.word = res.data.word;
                 $game.currentWord.definition = res.data.definition;
                 $game.definitions = [];
-                addNewUserDefinition($myUsername, $game.currentWord.definition)
+                $game.addNewPlayerDefinition($myUsername, $game.currentWord.definition)
 
             }).catch(err => {
                 if(err.code == "ECONNABORTED") {
@@ -60,7 +65,7 @@
                 username: $myUsername,
                 definition: myDefinition
             }).then(() => {
-                $game.currentWord.definition = myDefinition
+                submittedDefinition = myDefinition;
             }).catch(err => {
                 if(err.code == "ECONNABORTED") {
                     $errMessage = "Þjónn var of lengi a svara"
@@ -77,9 +82,9 @@
         if($game) {
             $isLoading = true
             $errMessage = ''
-            if($openForSubmissions){
+            if($game.openForSubmissions){
                 api.put(`closeForSubmissions/${$game.code}`).then(() => {
-                    $openForSubmissions = false
+                    $game.openForSubmissions = false
                 }).catch(err => {
                     if(err.code == "ECONNABORTED") {
                         $errMessage = "Þjónn var of lengi a svara"
@@ -90,7 +95,7 @@
             }
             else {
                 api.put(`openForSubmissions/${$game.code}`).then(() => {
-                    $openForSubmissions = true
+                    $game.openForSubmissions = true
                 }).catch(err => {
                     if(err.code == "ECONNABORTED") {
                         $errMessage = "Þjónn var of lengi a svara"
@@ -128,16 +133,6 @@
         }
     }
 
-    function addNewUserDefinition(player: string, definition: string) {
-        if(!$game) return
-        let idx = $game.definitions.findIndex(ud => ud.player == player)
-        if(idx == -1){
-            $game.definitions = [...$game.definitions, {player, definition}]
-        } else {
-            $game.definitions[idx].definition = definition
-        }
-    }
-
     function shufflePlayerDefinitions() {
         if(!$game) return;
         if($game.definitions.length < 2) return
@@ -170,12 +165,10 @@
 
 {#if $game}
     <div class='h-full w-full flex flex-col items-center overflow-auto'>
-        <div class='flex flex-col items-center mb-4'>
-            <h3 class=''>{$game.currentWord.word}</h3>
-            <!--<p class='text-center text-lg min-h-8'>{$game.currentWord.definition}</p>-->
-        </div>
+
 
         {#if $game.currentPlayer == $myUsername}
+            <h3 class='mb-4'>{$game.currentWord.word}</h3>
 
             <div class='h-full w-full flex flex-col justify-between items-center overflow-auto'>
                 <div class='w-full flex flex-col items-center overflow-auto'>
@@ -197,7 +190,7 @@
                     <LoadingIndicator bind:isLoading={$isLoading} />
                     <p class='text-amber-400 min-h-6 py-2 text-center'>{$errMessage}</p>
                     <div class='flex w-full [&>button]:px-0'>
-                        {#if $openForSubmissions}
+                        {#if $game.openForSubmissions}
                             <button onclick={toggleSubmissions} class='rounded-r-none w-1/3 flex justify-center'><img src={openPadlock} width="25" height="25" alt="open padlock"></button>
                         {:else}
                             <button onclick={toggleSubmissions} class='rounded-r-none w-1/3 flex justify-center'><img src={padlock} width="25" height="25" alt="padlock"></button>
@@ -209,12 +202,13 @@
             </div>
 
         {:else}
-            <div class='flex flex-col h-full overflow-auto justify-between'>
+            <div class='flex flex-col h-full items-center overflow-auto justify-between'>
                 <div class='flex flex-col items-center text-md min-h-16'>
-                    {#if $game.currentWord.definition}
+                    <h3 class='mb-4'>{$game.currentPlayer} á leik</h3>
+                    {#if submittedDefinition}
                         <p class='border-b border-slate-200/50 pb-1 px-12 text-md'>Mín skýring</p>
                     {/if}
-                    <p class='text-center mt-1'>{$game.currentWord.definition}</p>
+                    <p class='text-center mt-1'>{submittedDefinition}</p>
                 </div>
                 <div class='flex flex-col w-full overflow-auto'>
                     <Scoreboard players={$game.players}/>

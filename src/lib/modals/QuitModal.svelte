@@ -17,9 +17,9 @@
 
     async function quit() {
         if($game) {
-            isLoading = true
-            errMessage = ''
-            await api.put(`leaveGame/${$game.code}`, {name: $myUsername}).then(() => {
+            //isLoading = true
+            //errMessage = ''
+            api.put(`leaveGame/${$game.code}`, {name: $myUsername})/*.then(() => {
                 close(true)
             }).catch(err => {
                 if(err.code == "ECONNABORTED") {
@@ -27,8 +27,9 @@
                 } else {
                     errMessage = err.response.data
                 }
-            }) 
-            isLoading = false    
+            }) */
+            close(true)
+            //isLoading = false    
         }
     }
 

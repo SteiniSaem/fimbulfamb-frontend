@@ -10,8 +10,9 @@ export class Game {
     currentWord: Word
     joinable: boolean
     hasStarted: boolean
+    openForSubmissions: boolean
 
-    public constructor(code: string, owner: string, players: Player[], currentPlayer: string, definitions: Definition[], currentWord: Word, joinable: boolean, hasStarted: boolean) {
+    public constructor(code: string, owner: string, players: Player[], currentPlayer: string, definitions: Definition[], currentWord: Word, joinable: boolean, hasStarted: boolean, openForSubmissions: boolean) {
         this.code = code
         this.owner = owner
         this.players = players
@@ -20,6 +21,21 @@ export class Game {
         this.currentWord = currentWord
         this.joinable = joinable
         this.hasStarted = hasStarted
+        this.openForSubmissions = openForSubmissions
+    }
+
+    static fromJSON(data: any): Game {
+        return new Game(
+            data.code,
+            data.owner,
+            data.players,
+            data.currentPlayer,
+            data.definitions,
+            data.currentWord,
+            data.joinable,
+            data.hasStarted,
+            data.openForSubmissions
+        )
     }
 
     public addNewPlayerDefinition(player: string, definition: string) {
@@ -30,34 +46,6 @@ export class Game {
         } else {
             this.definitions[idx].definition = definition
         }
-    }
-
-    public shufflePlayerDefinitions() {
-        if(this.definitions.length < 2) return
-
-        let currentIndex = this.definitions.length;
-        let beforeShuffle = this.definitions.map(pd => pd.player)
-        // While there remain elements to shuffle...
-        while (currentIndex > 0) {
-
-            // Pick a remaining element...
-            let randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-
-            // And swap it with the current element.
-            [this.definitions[currentIndex], this.definitions[randomIndex]] = [this.definitions[randomIndex], this.definitions[currentIndex]];
-            
-            if(currentIndex == 0) {
-                // if array hasn't changed, start again
-                let afterShuffle = this.definitions.map(pd => pd.player)
-                console.log(beforeShuffle)
-                console.log(afterShuffle)
-                if(compareArrays(beforeShuffle, afterShuffle)){
-                    currentIndex = this.definitions.length
-                }
-            }
-        }
-        
     }
 
 }

@@ -23,7 +23,7 @@
         isLoading = true;
         $errMessage = ''
         await api.put(`createNewGame/${$myUsername}`).then(res => {
-            $game = new Game(res.data, $myUsername, [{name: $myUsername, points: 0}], $myUsername, [], {word: '', definition: ''}, true, false);
+            $game = new Game(res.data, $myUsername, [{name: $myUsername, points: 0}], $myUsername, [], {word: '', definition: ''}, true, false, false);
             $webSocketShouldBeClosed = false
             $webSocket = setupWebsocketConnection()
 
@@ -46,10 +46,10 @@
         isLoading = true;
         $errMessage = ''
         await api.put(`joinGame/${code}`, {username: $myUsername}).then(res => {
-            $game = new Game(res.data.id, res.data.owner, res.data.players, res.data.current_player, res.data.player_definitions, res.data.current_word, res.data.joinable, res.data.has_started)
+            $game = new Game(res.data.id, res.data.owner, res.data.players, res.data.current_player, res.data.player_definitions, res.data.current_word, res.data.joinable, res.data.has_started, res.data.open_for_submissions)
             $webSocketShouldBeClosed = false
             $webSocket = setupWebsocketConnection()
-            
+
             $currentView = $game.hasStarted ? 'game' : 'lobby'
         }).catch(err => {
             if(err.code == "ECONNABORTED") {

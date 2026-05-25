@@ -4,12 +4,16 @@
 	import LoadingIndicator from '$compopnents/LoadingIndicator.svelte';
     import {currentView, game, webSocket, myUsername, errMessage, isLoading} from '$store';
 	import { onMount } from 'svelte';
+	import { setupWebsocketConnection } from '$lib/websocket';
 
 
     onMount(() => {
         if(!$game){
             $currentView = 'home'
             return
+        }
+        if(!$webSocket || $webSocket.readyState == $webSocket.CLOSED){
+            setupWebsocketConnection()
         }
         $errMessage = ''
         /*for(let i = 0; i < 12; i++) {
