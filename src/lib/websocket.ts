@@ -50,20 +50,20 @@ export function setupWebsocketConnection(){
                     if(g.currentPlayer == get(myUsername)){
                         getWord()
                     }
-                    else {
-                        g.currentWord = {word: `${g.currentPlayer} á leik`, definition: ''}
+                    else if(g.wordIsVisible){
+                        g.currentWord.word = parts[2].trim()
                     }
                     break;
 
                 case "Definition":
-                    let player = parts[1]
-                    let definition = parts[2]
+                    let player = parts[1].trim()
+                    let definition = parts[2].trim()
                     g.addNewPlayerDefinition(player, definition)
                     break;
 
                 case "Scores":
                     for(let i = 1; i < parts.length; i += 2){ //i = 1 cuz fyrst element is "Score", rest is [{player}, {score}, {player}, {score}, ...]
-                        let playerName = parts[i]
+                        let playerName = parts[i].trim()
                         let score = parseInt(parts[i+1])
                         let idx = g.players.findIndex(p => p.name.trim() == playerName.trim())
                         if(idx > -1) g.players[idx].points = score
@@ -87,6 +87,20 @@ export function setupWebsocketConnection(){
                         ws.close()
                     }
                     break;
+                
+                case "Show word":
+                    g.wordIsVisible = true
+                    let word = parts[1]
+                    if(g.currentPlayer != get(myUsername)){
+                        g.currentWord.word = word
+                    }
+                    break;
+
+                case "Hide word":
+                    g.wordIsVisible = false
+                    if(g.currentPlayer != get(myUsername)){
+                        g.currentWord.word = ''
+                    }
             }
             game.set(g)
         }

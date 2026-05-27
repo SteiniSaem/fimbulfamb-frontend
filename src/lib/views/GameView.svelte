@@ -9,6 +9,7 @@
 	import Scoreboard from "$compopnents/scoreboard.svelte";
     import padlock from "$assets/padlock.png"
     import openPadlock from "$assets/open-padlock.png"
+    import next from "$assets/next.png"
     import LoadingIndicator from '$compopnents/LoadingIndicator.svelte';
     import { compareArrays } from '$common';
 	import { setupWebsocketConnection } from '$lib/websocket';
@@ -177,13 +178,13 @@
                     <!-- Player definitions -->
                     <div class='h-full w-full flex items-center flex-col overflow-auto my-4'>
                         {#each $game.definitions as pd (pd.player)}
-                            <div class='bg-slate-200 rounded-xl w-full py-1 px-2 my-1 text-center text-slate-600' transition:slide|global animate:flip={{duration: 400}}>
+                            <div class='bg-slate-200 rounded-xl w-full py-1 px-2 my-1 text-center text-slate-600' in:slide|global animate:flip={{duration: 400}}>
                                 <p class='font-semibold text-sm'>{pd.player}</p>
                                 <p>{pd.definition}</p>
                             </div>
                         {/each}
                     </div>
-                    <button class='my-1 bg-transparent text-slate-200' onclick={shufflePlayerDefinitions}>Stokka</button>
+                    <button class='my-1 bg-pink-300 hover:brightness-90 text-sm px-8' onclick={shufflePlayerDefinitions}>Stokka</button>
                 </div>
 
                 <div class='w-full flex flex-col items-center'>
@@ -196,15 +197,18 @@
                             <button onclick={toggleSubmissions} class='rounded-r-none w-1/3 flex justify-center'><img src={padlock} width="25" height="25" alt="padlock"></button>
                         {/if}
                         <button onclick={setScores} class='rounded-none border-x border-slate-400 grow'>Stig</button>
-                        <button onclick={nextRound} class='rounded-l-none font-bold w-1/3'>&gt;&gt;</button>
+                        <button onclick={nextRound} class='rounded-l-none font-bold w-1/3 flex justify-center'><img src={next} alt="next" width="25"></button>
                     </div>
                 </div>
             </div>
 
         {:else}
-            <div class='flex flex-col h-full items-center overflow-auto justify-between'>
-                <div class='flex flex-col items-center text-md min-h-16'>
-                    <h3 class='mb-4'>{$game.currentPlayer} á leik</h3>
+            <div class='flex flex-col h-full items-center overflow-auto justify-between w-full'>
+                <div class='flex flex-col items-center text-md min-h-34'>
+                    <h3 class=''>{$game.currentPlayer} á orðið</h3>
+                    {#if $game.wordIsVisible}
+                        <p>orðið er {$game.currentWord.word}</p>
+                    {/if}
                     {#if submittedDefinition}
                         <p class='border-b border-slate-200/50 pb-1 px-12 text-md'>Mín skýring</p>
                     {/if}
@@ -213,10 +217,10 @@
                 <div class='flex flex-col w-full overflow-auto'>
                     <Scoreboard players={$game.players}/>
                 </div>
-                <div>
+                <div class='w-full'>
                     <p class='text-amber-400 text-center h-8 mt-2'>{$errMessage}</p>
-                    <div class='flex'>
-                        <textarea placeholder="Mín skýring" bind:value={myDefinition} class=''></textarea>
+                    <div class='flex w-full'>
+                        <textarea placeholder="Mín skýring" bind:value={myDefinition} class='grow'></textarea>
                         <button onclick={submitDefinition} class='rounded-xl ml-2'>Skila</button>
                     </div> 
                 </div>

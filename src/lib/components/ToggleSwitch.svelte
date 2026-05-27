@@ -1,23 +1,19 @@
 <script lang='ts'>
 
-    let {/*option1, option2,*/ value = $bindable(), onChange} : {/*option1:string, option2:string,*/ value:boolean, onChange:Function} = $props(); //width er til að hafa fast width því annars stækkar það þegar maður togglar því valda optionið verður bold og því breiðara og það stækkar þá líka containerinn sem toggleswitchinn er í
+    let {/*option1, option2,*/ value = $bindable(), disabled = $bindable(), onChange} : {/*option1:string, option2:string,*/ value:boolean, disabled?: boolean, onChange:Function} = $props(); //width er til að hafa fast width því annars stækkar það þegar maður togglar því valda optionið verður bold og því breiðara og það stækkar þá líka containerinn sem toggleswitchinn er í
 
 
-    /*function click(){
-        
-        if(value == option1){
-            value = option2
-        }
-        else{
-            value = option1
-        }
-    }*/
+    function click(){
+		if(disabled) return
+		value = !value;
+		onChange()
+    }
 </script>
 
 <div class='flex select-none items-center'>
     <!--<p class={`mr-3 w-10 ${option1 == value ? 'font-semibold': ''}`}>{option1}</p>-->
     <label class="switch">
-        <input type="checkbox" checked={value == false}  onclick={() => {value = !value; onChange()}}/>
+        <input type="checkbox" checked={value == false}  onclick={click}/>
         <span class={`slider transition duration-200 ${value ? 'bg-emerald-400' : 'bg-slate-300'}`}></span>
     </label>
     <!--<p class={`ml-2 w-10 ${option2 == value ? 'font-semibold': ''}`}>{option2}</p>-->

@@ -9,10 +9,11 @@ export class Game {
     definitions: Definition[]
     currentWord: Word
     joinable: boolean
+    wordIsVisible: boolean
     hasStarted: boolean
     openForSubmissions: boolean
 
-    public constructor(code: string, owner: string, players: Player[], currentPlayer: string, definitions: Definition[], currentWord: Word, joinable: boolean, hasStarted: boolean, openForSubmissions: boolean) {
+    public constructor(code: string, owner: string, players: Player[], currentPlayer: string, definitions: Definition[], currentWord: Word, joinable: boolean, wordIsVisible: boolean, hasStarted: boolean, openForSubmissions: boolean) {
         this.code = code
         this.owner = owner
         this.players = players
@@ -20,6 +21,7 @@ export class Game {
         this.definitions = definitions
         this.currentWord = currentWord
         this.joinable = joinable
+        this.wordIsVisible = wordIsVisible
         this.hasStarted = hasStarted
         this.openForSubmissions = openForSubmissions
     }
@@ -33,6 +35,7 @@ export class Game {
             data.definitions,
             data.currentWord,
             data.joinable,
+            data.wordIsVisible,
             data.hasStarted,
             data.openForSubmissions
         )

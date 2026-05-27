@@ -62,6 +62,6 @@
   }
 
   #app {
-    width: min(100%, 40rem)
+    width: min(100%, 30rem)
   }
 </style>

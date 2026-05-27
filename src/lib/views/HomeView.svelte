@@ -14,6 +14,7 @@
             $webSocketShouldBeClosed = true
             $webSocket.close()
         }
+        $errMessage = ''
     })
 
     async function createGame(){
@@ -23,7 +24,8 @@
         isLoading = true;
         $errMessage = ''
         await api.put(`createNewGame/${$myUsername}`).then(res => {
-            $game = new Game(res.data, $myUsername, [{name: $myUsername, points: 0}], $myUsername, [], {word: '', definition: ''}, true, false, false);
+                            // code        owner        players                     currentPlayer definitions   currentWord            joinable  word_visible  hasStarted   openForSubmissions             
+            $game = new Game(res.data, $myUsername, [{name: $myUsername, points: 0}], $myUsername,    [],    {word: '', definition: ''}, false,     false,        false,    false);
             $webSocketShouldBeClosed = false
             $webSocket = setupWebsocketConnection()
 
@@ -46,7 +48,7 @@
         isLoading = true;
         $errMessage = ''
         await api.put(`joinGame/${code}`, {username: $myUsername}).then(res => {
-            $game = new Game(res.data.id, res.data.owner, res.data.players, res.data.current_player, res.data.player_definitions, res.data.current_word, res.data.joinable, res.data.has_started, res.data.open_for_submissions)
+            $game = new Game(res.data.id, res.data.owner, res.data.players, res.data.current_player, res.data.player_definitions, res.data.current_word, res.data.joinable, res.data.wordIsVisible, res.data.has_started, res.data.open_for_submissions)
             $webSocketShouldBeClosed = false
             $webSocket = setupWebsocketConnection()
 
