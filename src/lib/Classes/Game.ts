@@ -12,8 +12,9 @@ export class Game {
     wordIsVisible: boolean
     hasStarted: boolean
     openForSubmissions: boolean
+    mySubmittedDefinition: string
 
-    public constructor(code: string, owner: string, players: Player[], currentPlayer: string, definitions: Definition[], currentWord: Word, joinable: boolean, wordIsVisible: boolean, hasStarted: boolean, openForSubmissions: boolean) {
+    public constructor(code: string, owner: string, players: Player[], currentPlayer: string, definitions: Definition[], currentWord: Word, joinable: boolean, wordIsVisible: boolean, hasStarted: boolean, openForSubmissions: boolean, mySubmittedDefinition: string) {
         this.code = code
         this.owner = owner
         this.players = players
@@ -24,6 +25,7 @@ export class Game {
         this.wordIsVisible = wordIsVisible
         this.hasStarted = hasStarted
         this.openForSubmissions = openForSubmissions
+        this.mySubmittedDefinition = mySubmittedDefinition
     }
 
     static fromJSON(data: any): Game {
@@ -37,7 +39,8 @@ export class Game {
             data.joinable,
             data.wordIsVisible,
             data.hasStarted,
-            data.openForSubmissions
+            data.openForSubmissions,
+            data.mySubmittedDefinition
         )
     }
 

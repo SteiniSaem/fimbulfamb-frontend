@@ -46,7 +46,8 @@ export function setupWebsocketConnection(){
                 case "Next Round":
                     g.definitions = []
                     g.currentPlayer = parts[1].trim()
-                    g.openForSubmissions =true
+                    g.openForSubmissions = true
+                    g.mySubmittedDefinition = ''
                     if(g.currentPlayer == get(myUsername)){
                         getWord()
                     }

@@ -15,7 +15,6 @@
 	import { setupWebsocketConnection } from '$lib/websocket';
 
     let myDefinition = $state("")
-    let submittedDefinition = $state("")
 
     onMount(() => {
         if($game){
@@ -24,16 +23,6 @@
                 setupWebsocketConnection()
             }
         }
-
-        /*if($game.currentPlayer == $myUsername){ // if its your turn, get the word
-            getWord();
-        }
-        else {
-            $game.currentWord = {word: `${$game.currentPlayer} á leik`, definition: ''}
-        }*/
-
-       
-        
     })
 
     async function getNewWord() {
@@ -59,14 +48,15 @@
     }
 
     async function submitDefinition(){
-        if($game) {
+        if($game && myDefinition.length > 0) {
             $isLoading = true
             $errMessage = ''
             await api.put(`submitDefinition/${$game.code}`, {
                 username: $myUsername,
                 definition: myDefinition
             }).then(() => {
-                submittedDefinition = myDefinition;
+                $game.mySubmittedDefinition = myDefinition;
+                myDefinition = ''
             }).catch(err => {
                 if(err.code == "ECONNABORTED") {
                     $errMessage = "Þjónn var of lengi a svara"
@@ -209,13 +199,13 @@
                     {#if $game.wordIsVisible}
                         <p>orðið er {$game.currentWord.word}</p>
                     {/if}
-                    {#if submittedDefinition}
+                    {#if $game.mySubmittedDefinition}
                         <p class='border-b border-slate-200/50 pb-1 px-12 text-md'>Mín skýring</p>
                     {/if}
-                    <p class='text-center mt-1'>{submittedDefinition}</p>
+                    <p class='text-center mt-1'>{$game.mySubmittedDefinition}</p>
                 </div>
                 <div class='flex flex-col w-full overflow-auto'>
-                    <Scoreboard players={$game.players}/>
+                    <Scoreboard players={$game.players} myUsername={$myUsername}/>
                 </div>
                 <div class='w-full'>
                     <p class='text-amber-400 text-center h-8 mt-2'>{$errMessage}</p>
