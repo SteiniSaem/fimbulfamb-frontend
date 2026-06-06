@@ -67,7 +67,7 @@
 <div class='flex flex-col items-center p-4 h-full'>
     <h1 class='mb-12'>Fimbulfamb</h1>
 
-    <input type="text" placeholder="Nafn" maxlength="10" bind:value={$myUsername}>
+    <input type="text" placeholder="Nafn" maxlength="14" bind:value={$myUsername}>
     <button class='my-6' onclick={createGame}>Stofna nýjan leik</button>
 
     <div class='flex items-center mt-6'>

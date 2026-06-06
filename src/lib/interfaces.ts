@@ -8,8 +8,6 @@ export interface Player {
     points: number;
 }
 
-
-
 export interface Definition {
     player: string;
     definition: string;

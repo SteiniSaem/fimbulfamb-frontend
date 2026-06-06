@@ -1,5 +1,6 @@
 import { writable } from "svelte/store";
 import { Game } from '$classes/Game'
+import type { Player } from "$interfaces";
 
 export function persistentStore<T>(key: string, initialValue: T, reviver?: (data: any) => T) {
     const stored = localStorage.getItem(key);

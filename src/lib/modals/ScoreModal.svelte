@@ -49,7 +49,7 @@
                 {#each players as player, i}
                     <div class='flex justify-between items-center w-full my-2'>
                         <p>{player.name}</p>
-                        <div class='flex items-center select-none'>
+                        <div class='flex items-center select-none ml-4'>
                             <button class="p-0 h-8 w-8 bg-slate-300 hover:bg-slate-400 text-xl" onclick={() => {players[i].points -= 1}}>-</button>
                             <p class='w-12 text-center'>{player.points}</p>
                             <button class='p-0 h-8 w-8 bg-slate-300 hover:bg-slate-400 text-xl' onclick={() => {players[i].points += 1}}>+</button>

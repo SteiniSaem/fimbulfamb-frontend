@@ -6,6 +6,8 @@
     import ToggleSwitch from "$compopnents/ToggleSwitch.svelte";
     import { game } from "$store";
 	import { onMount } from "svelte";
+	import { modals } from "svelte-modals";
+	import ScoreHistoryModal from "./ScoreHistoryModal.svelte";
 
     let {isOpen, close }: ModalProps = $props() 
     let isLoading = $state(false)
@@ -69,14 +71,15 @@
 
         <div class='flex flex-col items-center' class:opacity-30={isLoading}>
             <p class='text-xl mb-4'>{$game.code}</p>
-            <div class='flex w-full justify-between mb-6'>
+            <div class='flex w-full justify-between mb-4'>
                 <p class='mr-12'>Opna fyrir join</p>
                 <ToggleSwitch bind:value={$game.joinable} onChange={toggleJoinable} bind:disabled={isLoading}/>
             </div>
-            <div class='flex w-full justify-between mb-6'>
+            <div class='flex w-full justify-between mb-4'>
                 <p class='mr-12'>Birta Orð</p>
                 <ToggleSwitch bind:value={$game.wordIsVisible} onChange={toggleWordVisibility} bind:disabled={isLoading}/>
             </div>
+            <button class='mb-4 bg-slate-300' onclick={() => modals.open(ScoreHistoryModal)}>Skoða stiga sögu</button>
             {#each $game.players as player}
                 {#if player.name != $game.owner}
                 <div class='flex items-center my-2 w-full justify-between'>
