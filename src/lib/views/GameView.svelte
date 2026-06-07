@@ -159,7 +159,7 @@
 
 
         {#if $game.currentPlayer == $myUsername}
-            <h3 class='mb-4'>{$game.currentWord.word}</h3>
+            <h3 class='mb-4 text-center'>{$game.currentWord.word}</h3>
 
             <div class='h-full w-full flex flex-col justify-between items-center overflow-auto'>
                 <div class='w-full flex flex-col items-center overflow-auto'>

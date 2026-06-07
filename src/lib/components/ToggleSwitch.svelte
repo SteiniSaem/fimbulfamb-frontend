@@ -14,7 +14,7 @@
     <!--<p class={`mr-3 w-10 ${option1 == value ? 'font-semibold': ''}`}>{option1}</p>-->
     <label class="switch">
         <input type="checkbox" checked={value == false}  onclick={click}/>
-        <span class={`slider transition duration-200 ${value ? 'bg-emerald-400' : 'bg-slate-300'}`}></span>
+        <span class={`slider transition duration-200 ${value ? 'bg-indigo-400' : 'bg-slate-300'}`}></span>
     </label>
     <!--<p class={`ml-2 w-10 ${option2 == value ? 'font-semibold': ''}`}>{option2}</p>-->
 </div>
