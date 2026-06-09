@@ -2,7 +2,7 @@
 	import { fade } from "svelte/transition";
     import type { ModalProps } from 'svelte-modals'
     //import { game } from "$store";
-    import type { Player } from '$interfaces'
+    import type { Definition, Player } from '$interfaces'
 	import { onMount } from "svelte";
 	import api from "$api";
 	import LoadingIndicator from "$compopnents/LoadingIndicator.svelte";
@@ -11,16 +11,19 @@
 
     interface MyModalProps extends ModalProps<closeValue> {
         players: Player[]
+        definitionsProp: Definition[]
     }
 
-    let { isOpen, close, playersProp, gameCode} : MyModalProps = $props()
+    let { isOpen, close, playersProp, definitionsProp,  gameCode} : MyModalProps = $props()
 
     let players: Player[] = $state([])
+    let definitions: Definition[] = $state([])
     let errMessage = $state("")
     let isLoading = $state(false)
 
     onMount(() => {
-        players = playersProp // playersProp er ekki reactive af eh ástæðu þannig þarf að gera $state variable
+        players = playersProp // playersProp og definitionsProp eru ekki reactive af eh ástæðu þannig þarf að gera $state variable
+        definitions = definitionsProp
     })
 
     async function save() {
@@ -38,17 +41,25 @@
         isLoading = false    
     }
 
+    function getDefinitionByPlayer(playerName: string) {
+        let def = definitions.find(d => d.player == playerName)
+        return def ? def.definition : ''
+    }
+
 </script>
 
 {#if isOpen}
 <div role="dialog" class="modal">
     <div class="contents rounded-2xl text-slate-700 max-h-2/3 overflow-auto" transition:fade|global={{duration: 150}}>
         <!--<p class='font-semibold border-b border-slate-400/60 w-full pb-2'>Stigatafla</p>-->
-        <div class='w-full overflow-auto'>
+        <div class='flex flex-col w-full overflow-y-auto'>
             {#if !isLoading}
                 {#each players as player, i}
                     <div class='flex justify-between items-center w-full my-2'>
-                        <p>{player.name}</p>
+                        <div class='flex flex-col min-w-0'>
+                            <p>{player.name}</p>
+                            <p class='text-sm opacity-50 truncate'>{getDefinitionByPlayer(player.name)}</p>
+                        </div>
                         <div class='flex items-center select-none ml-4'>
                             <button class="p-0 h-8 w-8 bg-slate-300 hover:bg-slate-400 text-xl" onclick={() => {players[i].points -= 1}}>-</button>
                             <p class='w-12 text-center'>{player.points}</p>
@@ -89,7 +100,7 @@
   }
 
   .contents {
-    min-width: 240px;
+    width: 300px;
     padding: 16px;
     display: flex;
     flex-direction: column;

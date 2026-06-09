@@ -117,7 +117,7 @@
 
     async function setScores() {
         if($game){
-            let res = await modals.open(ScoreModal, {playersProp: $game.players, gameCode: $game.code})
+            let res = await modals.open(ScoreModal, {playersProp: $game.players, definitionsProp: $game.definitions, gameCode: $game.code})
             if(res){
                 $game.players = res
             }
