@@ -7,3 +7,8 @@ export function compareArrays(a1: string[]|number[], a2: string[]|number[]){
     }
     return true
 }
+
+
+export async function wait(ms: number){
+    new Promise(res => setTimeout(res, ms));
+}

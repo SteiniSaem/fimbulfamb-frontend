@@ -1,23 +1,29 @@
 import { PUBLIC_WS_URL } from "$env/static/public";
-import { currentView, game, myUsername, webSocketShouldBeClosed, isLoading, errMessage } from "$store";
+import { currentView, game, myUsername, webSocketShouldBeClosed, isLoading, errMessage, webSocket } from "$store";
 import { get } from "svelte/store";
 import api from "$api";
 
-let ws: WebSocket;
 
 
-export function setupWebsocketConnection(){
-    let g = get(game)
-    if (!g) return null
+export async function setupWebsocketConnection(): Promise<WebSocket>{
+    return new Promise((resolve, reject) => {
 
-    ws = new WebSocket(`${PUBLIC_WS_URL}/game/${g.code}/ws`);
-    
-    webSocketShouldBeClosed.set(false)
+        let g = get(game)
+        if (!g) return reject(new Error(`Enginn slíkur leikur`))
+
+        const ws = new WebSocket(`${PUBLIC_WS_URL}/game/${g.code}/ws`);
+        
+        webSocketShouldBeClosed.set(false)
 
         // Event: Connection opened
         ws.onopen = (event) => {
             console.log(`WebSocket connection to Rocket server for game ${g.code} established`);
+            resolve(ws)
         };
+
+        ws.onerror = () => {
+            reject(new Error("Náðist ekki tenging við vefþjón"))
+        }
 
         // Event: Listen for messages from server
         ws.onmessage = (event) => {
@@ -107,13 +113,13 @@ export function setupWebsocketConnection(){
         }
 
         // Event: Connection closed
-        ws.onclose = () => {
+        ws.onclose = async () => {
             console.log('Disconnected');
             if(!get(webSocketShouldBeClosed)){ // if disconnects by accident then reconnect
-                setupWebsocketConnection()
+                webSocket.set(await setupWebsocketConnection())
             }
         };
-    return ws;
+    })
 }
 
 async function getWord() {

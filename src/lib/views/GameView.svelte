@@ -16,11 +16,11 @@
 
     let myDefinition = $state("")
 
-    onMount(() => {
+    onMount(async () => {
         if($game){
             $errMessage = ''
             if(!$webSocket || $webSocket.readyState == $webSocket.CLOSED){
-                setupWebsocketConnection()
+                $webSocket = await setupWebsocketConnection()
             }
         }
     })

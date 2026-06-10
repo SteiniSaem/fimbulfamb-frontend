@@ -7,13 +7,13 @@
 	import { setupWebsocketConnection } from '$lib/websocket';
 
 
-    onMount(() => {
+    onMount(async () => {
         if(!$game){
             $currentView = 'home'
             return
         }
         if(!$webSocket || $webSocket.readyState == $webSocket.CLOSED){
-            setupWebsocketConnection()
+            $webSocket = await setupWebsocketConnection()
         }
         $errMessage = ''
         /*for(let i = 0; i < 12; i++) {

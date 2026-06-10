@@ -5,6 +5,7 @@
 	import { currentView, game, myUsername, errMessage, webSocket, webSocketShouldBeClosed } from "$store"
 	import { onMount } from "svelte";
     import { setupWebsocketConnection } from '$lib/websocket';
+	import { wait } from "$common";
 
     let code = $state('')
     let isLoading = $state(false)
@@ -23,12 +24,17 @@
 
         isLoading = true;
         $errMessage = ''
-        await api.put(`createNewGame/${$myUsername}`).then(res => {
+        await api.put(`createNewGame/${$myUsername}`).then(async res => {
                             // code        owner        players                     currentPlayer definitions   currentWord            joinable  word_visible  hasStarted   openForSubmissions   mySubmittedDefinition          
             $game = new Game(res.data, $myUsername, [{name: $myUsername, points: 0}], $myUsername,    [],    {word: '', definition: ''}, false,     false,        false,    true,                   "");
             $webSocketShouldBeClosed = false
-            $webSocket = setupWebsocketConnection()
-
+            try {
+                $webSocket = await setupWebsocketConnection()
+            }
+            catch (error) {
+                $errMessage = (error as Error).message
+            }
+            
             $currentView = 'lobby'
         }).catch(err => {
             if(err.code == "ECONNABORTED") {
@@ -47,11 +53,15 @@
 
         isLoading = true;
         $errMessage = ''
-        await api.put(`joinGame/${code}`, {username: $myUsername}).then(res => {
+        await api.put(`joinGame/${code}`, {username: $myUsername}).then(async res => {
             $game = new Game(res.data.id, res.data.owner, res.data.players, res.data.current_player, res.data.player_definitions, res.data.current_word, res.data.joinable, res.data.wordIsVisible, res.data.has_started, res.data.open_for_submissions, "")
             $webSocketShouldBeClosed = false
-            $webSocket = setupWebsocketConnection()
-
+            try {
+                $webSocket = await setupWebsocketConnection()
+            }
+            catch (error) {
+                $errMessage = (error as Error).message
+            }
             $currentView = $game.hasStarted ? 'game' : 'lobby'
         }).catch(err => {
             if(err.code == "ECONNABORTED") {
