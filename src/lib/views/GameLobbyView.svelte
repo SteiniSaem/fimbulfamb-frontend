@@ -24,7 +24,7 @@
 
 
     async function startGame() {
-        if($game){
+        if($game && !$isLoading){
             $isLoading = true
             $errMessage = ''
             await api.put(`startGame/${$game.code}`).then(() => {

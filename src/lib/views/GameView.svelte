@@ -26,7 +26,7 @@
     })
 
     async function getNewWord() {
-        if($game) {
+        if($game && !$isLoading) {
             $isLoading = true
             $errMessage = ''
             api.get(`nextWord/${$game.code}`).then(res => {
@@ -48,7 +48,7 @@
     }
 
     async function submitDefinition(){
-        if($game && myDefinition.length > 0) {
+        if($game && myDefinition.length > 0 && !$isLoading) {
             $isLoading = true
             $errMessage = ''
             await api.put(`submitDefinition/${$game.code}`, {
@@ -70,7 +70,7 @@
     }
 
     async function toggleSubmissions() {
-        if($game) {
+        if($game && !$isLoading) {
             $isLoading = true
             $errMessage = ''
             if($game.openForSubmissions){

@@ -19,7 +19,7 @@
     })
 
     async function createGame(){
-        if($myUsername.length == 0) return
+        if($myUsername.length == 0 || isLoading) return
         $myUsername = $myUsername.trim()
 
         isLoading = true;
@@ -47,8 +47,7 @@
     }
 
     async function joinGame(){
-        if($myUsername.length == 0) return;
-        if(code.length == 0) return;
+        if($myUsername.length == 0 || code.length == 0 || isLoading) return;
         $myUsername = $myUsername.trim()
 
         isLoading = true;
