@@ -2,7 +2,7 @@
 	import HomeView from "$views/HomeView.svelte";
     import GameView from "$views/GameView.svelte";
 	import GameLobbyView from "$views/GameLobbyView.svelte";
-	import { currentView, game, myUsername, webSocket, webSocketShouldBeClosed } from "../store";
+	import { currentView, game, myUsername, webSocket, webSocketShouldBeClosed, errMessage, isLoading } from "../store";
     import { Modals } from 'svelte-modals'
 	import { fade } from "svelte/transition";
     import home from "$assets/home.png"
@@ -10,6 +10,70 @@
 	import { modals } from "svelte-modals";
 	import QuitModal from "$lib/modals/QuitModal.svelte";
     import SettingsModal from "$lib/modals/SettingsModal.svelte";
+	import { onDestroy, onMount } from "svelte";
+    import { setupWebsocketConnection } from "$lib/websocket";
+	import api from "$api";
+	import type { Game } from "$classes/Game";
+
+    onMount(() => {
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+    })
+
+    onDestroy(() => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+    });
+
+   async function handleVisibilityChange() {
+        if (document.visibilityState === 'visible') {
+            // reconnect websocket if needed
+            if ($game && (!$webSocket || $webSocket.readyState !== WebSocket.OPEN)) {
+                try {
+                    $webSocket = await setupWebsocketConnection()
+                }
+                catch (error) {
+                    let msg = (error as Error).message
+                    if(msg == 'Leikur ekki til') {
+                        $currentView = 'home'
+                    }
+                    else {
+                        $errMessage = msg
+                    }
+
+                }
+            }
+            // fetch current game state
+            if($game){
+                $game = await refreshGameState($game);
+                if($game.hasStarted) $currentView = 'game'
+                if($game.currentPlayer == $myUsername) {
+                    $game.definitions.push({player: $myUsername, definition: $game.currentWord.definition})
+                }
+            }
+        }
+    }
+
+    async function refreshGameState(game: Game) {
+        $isLoading = true
+        await api.get(`gameState/${game.code}/${$myUsername}`).then(res => {
+            console.log('refresh game state')
+            console.log(new Date())
+            console.log(res.data)
+            game.owner = res.data.owner
+            game.players = res.data.players
+            game.currentPlayer = res.data.current_player
+            game.definitions = res.data.player_definitions
+            game.currentWord = res.data.current_word
+            game.hasStarted = res.data.has_started
+            game.openForSubmissions = res.data.openForSubmissions
+
+        }).catch(err => {
+            console.log(err.response.data)
+            $errMessage = `Gat ekki sótt upplýsingar um leik ${game.code}`
+        });
+
+        $isLoading = false;
+        return game
+    }
 
     async function quitMaybe() {
         let quit = await modals.open(QuitModal);

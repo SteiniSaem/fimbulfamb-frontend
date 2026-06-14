@@ -9,7 +9,7 @@ export async function setupWebsocketConnection(): Promise<WebSocket>{
     return new Promise((resolve, reject) => {
 
         let g = get(game)
-        if (!g) return reject(new Error(`Enginn slíkur leikur`))
+        if (!g) return reject(new Error('Leikur ekki til'))
 
         const ws = new WebSocket(`${PUBLIC_WS_URL}/game/${g.code}/ws`);
         
@@ -50,6 +50,7 @@ export async function setupWebsocketConnection(): Promise<WebSocket>{
                     break;
                 
                 case "Next Round":
+                    errMessage.set('')
                     g.definitions = []
                     g.currentPlayer = parts[1].trim()
                     g.openForSubmissions = true
@@ -108,6 +109,13 @@ export async function setupWebsocketConnection(): Promise<WebSocket>{
                     if(g.currentPlayer != get(myUsername)){
                         g.currentWord.word = ''
                     }
+                    break;
+
+                case "End game":
+                    game.set(null)
+                    currentView.set('home')
+                    return
+
             }
             game.set(g)
         }

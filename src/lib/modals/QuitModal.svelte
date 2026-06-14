@@ -33,9 +33,16 @@
         }
     }
 
+    async function endGame() {
+        if($game){
+            api.delete(`endGame/${$game.code}`)
+            close(true)
+        }
+    }
+
 </script>
 
-{#if isOpen}
+{#if isOpen && $game}
 <div role="dialog" class="modal">
     <div class="pointer-events-auto bg-slate-200 rounded-2xl text-slate-700 p-4" transition:fade|global={{duration: 150}}>
         {#if !isLoading}
@@ -45,6 +52,9 @@
                 <button class='bg-emerald-500 text-white mr-4' onclick={() => close(false)}>Nei, halda áfram</button>
                 <button class='bg-rose-600 text-white' onclick={quit}>Já, Yfirgefa leik</button>
             </div>
+            {#if $game.owner == $myUsername}
+                <button class='bg-rose-600 mt-4 w-full' onclick={endGame}>Enda leik fyrir alla</button>
+            {/if}
         {:else}
             <LoadingIndicator bind:isLoading/>
         {/if}
