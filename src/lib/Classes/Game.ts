@@ -1,5 +1,4 @@
 import type { Player, Definition, Word } from "$interfaces"
-import { compareArrays } from "$common"
 
 export class Game {
     code: string

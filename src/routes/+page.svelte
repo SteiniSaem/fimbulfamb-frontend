@@ -12,10 +12,11 @@
     import SettingsModal from "$lib/modals/SettingsModal.svelte";
 	import { onDestroy, onMount } from "svelte";
     import { setupWebsocketConnection } from "$lib/websocket";
-	import api from "$api";
-	import type { Game } from "$classes/Game";
+	import { refreshGameState } from "$common";
 
-    onMount(() => {
+    onMount(async () => {
+        if($game) $game = await refreshGameState($game);
+
         document.addEventListener('visibilitychange', handleVisibilityChange);
     })
 
@@ -42,38 +43,12 @@
                 }
             }
             // fetch current game state
-            if($game){
-                $game = await refreshGameState($game);
-                if($game.hasStarted) $currentView = 'game'
-                if($game.currentPlayer == $myUsername) {
-                    $game.definitions.push({player: $myUsername, definition: $game.currentWord.definition})
-                }
+            if($game){    
+                $game = await refreshGameState($game);      
             }
         }
     }
 
-    async function refreshGameState(game: Game) {
-        $isLoading = true
-        await api.get(`gameState/${game.code}/${$myUsername}`).then(res => {
-            console.log('refresh game state')
-            console.log(new Date())
-            console.log(res.data)
-            game.owner = res.data.owner
-            game.players = res.data.players
-            game.currentPlayer = res.data.current_player
-            game.definitions = res.data.player_definitions
-            game.currentWord = res.data.current_word
-            game.hasStarted = res.data.has_started
-            game.openForSubmissions = res.data.openForSubmissions
-
-        }).catch(err => {
-            console.log(err.response.data)
-            $errMessage = `Gat ekki sótt upplýsingar um leik ${game.code}`
-        });
-
-        $isLoading = false;
-        return game
-    }
 
     async function quitMaybe() {
         let quit = await modals.open(QuitModal);

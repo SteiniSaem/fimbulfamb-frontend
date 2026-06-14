@@ -64,6 +64,18 @@
 
         isLoading = true;
         $errMessage = ''
+
+        // fá websocket tengingu áður en joinGame request er send.
+        // annars ef eh joinar eftir að request er send en áður en websocket tenging er gerð (sem tekur stundum smá tíma)
+        // þá fær maður ekki skilaboð um að sá leikmaður joinaði
+        $webSocketShouldBeClosed = false 
+        try {
+            $webSocket = await setupWebsocketConnection()
+        }
+        catch (error) {
+            $errMessage = (error as Error).message
+        }
+        
         await api.put(`joinGame/${code}`, {username: $myUsername}).then(async res => {
             $game = new Game(
                 res.data.id,
@@ -78,13 +90,6 @@
                 res.data.open_for_submissions,
                 ""
             );
-            $webSocketShouldBeClosed = false
-            try {
-                $webSocket = await setupWebsocketConnection()
-            }
-            catch (error) {
-                $errMessage = (error as Error).message
-            }
             $currentView = $game.hasStarted ? 'game' : 'lobby'
         }).catch(err => {
             if(err.code == "ECONNABORTED") {

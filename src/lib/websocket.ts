@@ -2,6 +2,7 @@ import { PUBLIC_WS_URL } from "$env/static/public";
 import { currentView, game, myUsername, webSocketShouldBeClosed, isLoading, errMessage, webSocket } from "$store";
 import { get } from "svelte/store";
 import api from "$api";
+import { refreshGameState } from "$common";
 
 
 
@@ -125,6 +126,10 @@ export async function setupWebsocketConnection(): Promise<WebSocket>{
             console.log('Disconnected');
             if(!get(webSocketShouldBeClosed)){ // if disconnects by accident then reconnect
                 webSocket.set(await setupWebsocketConnection())
+                let g = get(game)
+                if(g) {
+                    game.set(await refreshGameState(g))
+                }
             }
         };
     })
