@@ -5,7 +5,6 @@
 	import { currentView, game, myUsername, errMessage, webSocket, webSocketShouldBeClosed } from "$store"
 	import { onMount } from "svelte";
     import { setupWebsocketConnection } from '$lib/websocket';
-	import { wait } from "$common";
 
     let code = $state('')
     let isLoading = $state(false)
@@ -75,7 +74,7 @@
         catch (error) {
             $errMessage = (error as Error).message
         }
-        
+
         await api.put(`joinGame/${code}`, {username: $myUsername}).then(async res => {
             $game = new Game(
                 res.data.id,

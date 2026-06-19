@@ -1,4 +1,4 @@
-import { isLoading, myUsername, currentView } from "$store";
+import { isLoading, myUsername, currentView, webSocket, webSocketShouldBeClosed } from "$store";
 import { get } from "svelte/store";
 import type { Game } from "$classes/Game";
 import api from "$api";
@@ -15,7 +15,8 @@ export async function refreshGameState(game: Game) {
         game.definitions = res.data.player_definitions
         game.currentWord = res.data.current_word
         game.hasStarted = res.data.has_started
-        game.openForSubmissions = res.data.openForSubmissions
+        game.openForSubmissions = res.data.open_for_submissions
+        console.log("Open for submissions: ", res.data.open_for_submissions)
         
         if(game.currentPlayer == get(myUsername)) {
             game.definitions.push({player: get(myUsername), definition: game.currentWord.definition})
@@ -31,6 +32,8 @@ export async function refreshGameState(game: Game) {
     }).catch(err => {
         console.log(err.response.data)
         //$errMessage = `Gat ekki sótt upplýsingar um leik ${game.code}`
+        webSocketShouldBeClosed.set(true) // þetta er gert í onMount í HomeView þannig kanski óþarfi hér
+        get(webSocket)?.close()
         currentView.set('home')
         return null
     });

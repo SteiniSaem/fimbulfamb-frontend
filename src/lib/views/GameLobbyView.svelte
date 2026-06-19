@@ -2,7 +2,7 @@
 	import api from '$api';
     import { PUBLIC_WS_URL } from '$env/static/public';
 	import LoadingIndicator from '$compopnents/LoadingIndicator.svelte';
-    import {currentView, game, webSocket, myUsername, errMessage, isLoading} from '$store';
+    import {currentView, game, webSocket, myUsername, errMessage, isLoading, webSocketShouldBeClosed} from '$store';
 	import { onMount } from 'svelte';
 	import { setupWebsocketConnection } from '$lib/websocket';
 

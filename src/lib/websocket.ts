@@ -114,6 +114,8 @@ export async function setupWebsocketConnection(): Promise<WebSocket>{
 
                 case "End game":
                     game.set(null)
+                    webSocketShouldBeClosed.set(true) // þetta er gert í onMount í HomeView þannig kanski óþarfi hér
+                    get(webSocket)?.close()
                     currentView.set('home')
                     return
 
