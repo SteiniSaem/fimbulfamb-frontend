@@ -24,7 +24,6 @@
         isLoading = true;
         $errMessage = ''
         await api.put(`createNewGame/${$myUsername}`).then(async res => {
-                            // code        owner        players                     currentPlayer definitions   currentWord            joinable  word_visible  hasStarted   openForSubmissions   mySubmittedDefinition          
             $game = new Game(
                 res.data, // code
                 $myUsername, //owner
@@ -62,18 +61,7 @@
         $myUsername = $myUsername.trim()
 
         isLoading = true;
-        $errMessage = ''
-
-        // fá websocket tengingu áður en joinGame request er send.
-        // annars ef eh joinar eftir að request er send en áður en websocket tenging er gerð (sem tekur stundum smá tíma)
-        // þá fær maður ekki skilaboð um að sá leikmaður joinaði
-        $webSocketShouldBeClosed = false 
-        try {
-            $webSocket = await setupWebsocketConnection()
-        }
-        catch (error) {
-            $errMessage = (error as Error).message
-        }
+        $errMessage = ''        
 
         await api.put(`joinGame/${code}`, {username: $myUsername}).then(async res => {
             $game = new Game(
@@ -89,7 +77,20 @@
                 res.data.open_for_submissions,
                 ""
             );
-            $currentView = $game.hasStarted ? 'game' : 'lobby'
+
+            $webSocketShouldBeClosed = false 
+            try {
+                $webSocket = await setupWebsocketConnection()
+                $currentView = $game.hasStarted ? 'game' : 'lobby'
+            }
+            catch (error) {
+                console.log(error)
+                $errMessage = (error as Error).message
+                $game = null;
+                isLoading = false;
+                return
+            }
+            
         }).catch(err => {
             if(err.code == "ECONNABORTED") {
                 $errMessage = "Þjónn var of lengi a svara"

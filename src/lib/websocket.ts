@@ -22,7 +22,8 @@ export async function setupWebsocketConnection(): Promise<WebSocket>{
             resolve(ws)
         };
 
-        ws.onerror = () => {
+        ws.onerror = (error) => {
+            console.log(error)
             reject(new Error("Náðist ekki tenging við vefþjón"))
         }
 
@@ -94,6 +95,12 @@ export async function setupWebsocketConnection(): Promise<WebSocket>{
                         game.set(null)
                         currentView.set("home")
                         ws.close()
+                    }
+                    break;
+
+                case "New word":
+                    if(g.currentPlayer != get(myUsername)){
+                        g.mySubmittedDefinition = ""
                     }
                     break;
                 

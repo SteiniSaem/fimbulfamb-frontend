@@ -7,8 +7,7 @@ export async function refreshGameState(game: Game) {
     isLoading.set(true)
     await api.get(`gameState/${game.code}/${get(myUsername)}`).then(res => {
         console.log('refresh game state')
-        console.log(new Date())
-        console.log(res.data)
+        //console.log(res.data)
         game.owner = res.data.owner
         game.players = res.data.players
         game.currentPlayer = res.data.current_player
@@ -16,7 +15,6 @@ export async function refreshGameState(game: Game) {
         game.currentWord = res.data.current_word
         game.hasStarted = res.data.has_started
         game.openForSubmissions = res.data.open_for_submissions
-        console.log("Open for submissions: ", res.data.open_for_submissions)
         
         if(game.currentPlayer == get(myUsername)) {
             game.definitions.push({player: get(myUsername), definition: game.currentWord.definition})
