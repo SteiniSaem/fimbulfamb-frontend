@@ -194,15 +194,14 @@
 
         {:else}
             <div class='flex flex-col h-full items-center overflow-auto justify-between w-full'>
-                <div class='flex flex-col items-center text-md min-h-34'>
+                <div class='flex flex-col items-center text-md min-h-34 w-full'>
                     <h3 class=''>{$game.currentPlayer} á orðið</h3>
-                    {#if $game.wordIsVisible}
-                        <p>orðið er {$game.currentWord.word}</p>
+                    {#if $game.wordIsVisible || $game.mySubmittedDefinition}
+                        <div class='bg-slate-200 rounded-xl w-full py-1 px-2 my-1 text-center text-slate-600' in:slide|global>
+                            {#if $game.wordIsVisible}<p class='font-semibold text-sm'>{$game.currentWord.word}</p>{/if}
+                            {#if $game.mySubmittedDefinition}<p>{$game.mySubmittedDefinition}</p>{/if}
+                        </div>
                     {/if}
-                    {#if $game.mySubmittedDefinition}
-                        <p class='border-b border-slate-200/50 pb-1 px-12 text-md'>Mín skýring</p>
-                    {/if}
-                    <p class='text-center mt-1'>{$game.mySubmittedDefinition}</p>
                 </div>
                 <div class='flex flex-col w-full overflow-auto'>
                     <Scoreboard players={$game.players} myUsername={$myUsername}/>
