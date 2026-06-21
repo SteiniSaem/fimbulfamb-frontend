@@ -14,7 +14,7 @@ export async function setupWebsocketConnection(): Promise<WebSocket>{
 
         const ws = new WebSocket(`${PUBLIC_WS_URL}/game/${g.code}/ws`);
         
-        webSocketShouldBeClosed.set(false)
+        //webSocketShouldBeClosed.set(false)
 
         // Event: Connection opened
         ws.onopen = (event) => {
@@ -24,7 +24,12 @@ export async function setupWebsocketConnection(): Promise<WebSocket>{
 
         ws.onerror = (error) => {
             console.log(error)
-            reject(new Error("Náðist ekki tenging við vefþjón"))
+            if(get(webSocketShouldBeClosed)){
+                ws.close()
+            }
+            else{
+                reject(new Error("Náðist ekki tenging við vefþjón"))
+            }
         }
 
         // Event: Listen for messages from server

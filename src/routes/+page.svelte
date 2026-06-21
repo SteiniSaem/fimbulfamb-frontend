@@ -27,7 +27,7 @@
    async function handleVisibilityChange() {
         if (document.visibilityState === 'visible') {
             // reconnect websocket if needed
-            if ($game && (!$webSocket || $webSocket.readyState !== WebSocket.OPEN)) {
+            if ($game && (!$webSocket || $webSocket.readyState !== WebSocket.OPEN) && !$webSocketShouldBeClosed) {
                 try {
                     $webSocket = await setupWebsocketConnection()
                 }

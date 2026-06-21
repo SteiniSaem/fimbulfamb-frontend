@@ -1,7 +1,7 @@
 <script lang='ts'>
     import { flip } from 'svelte/animate';
 	import api from "$api";
-	import { errMessage, game, myUsername, isLoading, webSocket } from "$store";
+	import { errMessage, game, myUsername, isLoading, webSocket, webSocketShouldBeClosed } from "$store";
 	import { onMount } from "svelte";
 	import { slide } from "svelte/transition";
     import { modals } from 'svelte-modals'
@@ -19,7 +19,7 @@
     onMount(async () => {
         if($game){
             $errMessage = ''
-            if(!$webSocket || $webSocket.readyState == $webSocket.CLOSED){
+            if(!$webSocket || $webSocket.readyState == $webSocket.CLOSED && !$webSocketShouldBeClosed){
                 $webSocket = await setupWebsocketConnection()
             }
         }

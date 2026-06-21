@@ -12,7 +12,7 @@
             $currentView = 'home'
             return
         }
-        if(!$webSocket || $webSocket.readyState == $webSocket.CLOSED){
+        if(!$webSocket || $webSocket.readyState == $webSocket.CLOSED && !$webSocketShouldBeClosed){
             $webSocket = await setupWebsocketConnection()
         }
         $errMessage = ''
