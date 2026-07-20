@@ -163,16 +163,25 @@
 
             <div class='h-full w-full flex flex-col justify-between items-center overflow-auto'>
                 <div class='w-full flex flex-col items-center overflow-auto'>
-                <button onclick={getNewWord} class='bg-pink-300 hover:brightness-90 text-sm px-8'>Nýtt Orð</button>
+                    <button onclick={getNewWord} class='bg-pink-300 hover:brightness-90 text-sm px-8'>Nýtt Orð</button>
+
+                    <div class='mt-2 flex justify-between w-full px-4 text-slate-200/75'>
+                        <p>Skýringar</p>
+                        <p>{$game.definitions.length}/{$game.players.length}</p>
+                    </div>
 
                     <!-- Player definitions -->
-                    <div class='h-full w-full flex items-center flex-col overflow-auto my-4'>
-                        {#each $game.definitions as pd (pd.player)}
-                            <div class='bg-slate-200 rounded-xl w-full py-1 px-2 my-1 text-center text-slate-600' in:slide|global animate:flip={{duration: 400}}>
-                                <p class='font-semibold text-sm'>{pd.player}</p>
-                                <p>{pd.definition}</p>
-                            </div>
-                        {/each}
+                    <div class='h-full w-full flex items-center flex-col overflow-auto mb-4'>
+                            {#each $game.definitions as pd (pd.player)}
+                                <div  class='bg-slate-200 rounded-xl w-full py-1 px-2 my-1 text-center text-slate-600' in:slide|global animate:flip={{duration: 400}}>
+                                    <p class='font-semibold text-sm'>{pd.player}</p>
+                                    <div class='w-full flex justify-between items-center'>
+                                        {#if pd.player == $myUsername}<p>&#x2727;</p>{/if}
+                                        <p class='mx-2 w-full'>{pd.definition}</p>
+                                        {#if pd.player == $myUsername}<p>&#x2727;</p>{/if}
+                                    </div>
+                                </div>
+                            {/each}
                     </div>
                     <button class='my-1 bg-pink-300 hover:brightness-90 text-sm px-8' onclick={shufflePlayerDefinitions}>Stokka</button>
                 </div>
@@ -196,10 +205,13 @@
             <div class='flex flex-col h-full items-center overflow-auto justify-between w-full'>
                 <div class='flex flex-col items-center text-md min-h-34 w-full'>
                     <h3 class=''>{$game.currentPlayer} á orðið</h3>
-                    {#if $game.wordIsVisible || $game.mySubmittedDefinition}
+                    {#if $game.wordIsVisible}
+                        <p class='text-xl'>{$game.currentWord.word}</p>
+                    {/if}
+                    {#if $game.mySubmittedDefinition}
                         <div class='bg-slate-200 rounded-xl w-full py-1 px-2 my-1 text-center text-slate-600' in:slide|global>
-                            {#if $game.wordIsVisible}<p class='font-semibold text-sm'>{$game.currentWord.word}</p>{/if}
-                            {#if $game.mySubmittedDefinition}<p>{$game.mySubmittedDefinition}</p>{/if}
+                            <p class='font-semibold text-sm'>Mín skýring</p>
+                            <p>{$game.mySubmittedDefinition}</p>
                         </div>
                     {/if}
                 </div>

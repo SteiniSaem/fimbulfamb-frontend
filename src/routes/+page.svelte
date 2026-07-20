@@ -85,7 +85,7 @@
     {#snippet backdrop({ close })}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <div class="backdrop" onclick={() => close()} transition:fade|global={{duration: 100}}></div>
+        <div class="backdrop" onclick={() => close()} transition:fade|global={{duration: 250}}></div>
     {/snippet}
     </Modals>
 </div>
