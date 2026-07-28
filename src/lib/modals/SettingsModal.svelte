@@ -12,6 +12,7 @@
     import type { Player } from '$interfaces'
     import DragAndDrop from '$assets/drag-and-drop.png'
     import SixDots from '$assets/six-dots.png'
+	import AdminScoreModal from "./AdminScoreModal.svelte";
 
     interface PlayerListItem extends Player {
         expanded: boolean
@@ -174,6 +175,7 @@
                 <p class='mr-12'>Birta Orð</p>
                 <ToggleSwitch bind:value={$game.wordIsVisible} onChange={toggleWordVisibility} bind:disabled={isLoading}/>
             </div>
+            <button class='mb-2 bg-slate-300' onclick={() => modals.open(AdminScoreModal, {playersProp: $game.players, gameCode: $game.code})}>Breyta stigum</button>
             <button class='mb-4 bg-slate-300' onclick={() => modals.open(ScoreHistoryModal)}>Skoða stiga sögu</button>
             <div class='w-full mb-2 border-y border-slate-400' bind:this={playerListEl}>
                 {#each playerList as player, i (player.name)}

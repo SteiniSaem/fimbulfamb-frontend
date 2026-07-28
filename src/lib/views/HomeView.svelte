@@ -31,7 +31,7 @@
                 $myUsername, // currentPlayer
                 [], // definitions
                 {word: '', definition: ''}, // currentWord
-                false, // joinable
+                true, // joinable
                 false, // wordIsVisible
                 false, // hasStarted
                 true, // openForSubmissions
@@ -90,7 +90,7 @@
                 isLoading = false;
                 return
             }
-            
+
         }).catch(err => {
             if(err.code == "ECONNABORTED") {
                 $errMessage = "Þjónn var of lengi a svara"
