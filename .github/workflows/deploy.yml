@@ -16,5 +16,10 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Deploy
+        run: |
+          sudo mkdir -p /var/www/fimbulfamb_frontend
+          sudo rsync -a --delete build/ /var/www/fimbulfamb_frontend/
+
       - name: Restart service
         run: sudo systemctl restart nginx

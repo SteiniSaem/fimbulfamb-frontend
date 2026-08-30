@@ -13,6 +13,7 @@
     import LoadingIndicator from '$compopnents/LoadingIndicator.svelte';
     import { compareArrays } from '$common';
 	import { setupWebsocketConnection } from '$lib/websocket';
+	import ScoreBoardModal from '$lib/modals/ScoreBoardModal.svelte';
 
     let myDefinition = $state("")
 
@@ -183,9 +184,11 @@
                                 </div>
                             {/each}
                     </div>
-                    <button class='my-1 bg-pink-300 hover:brightness-90 text-sm px-8' onclick={shufflePlayerDefinitions}>Stokka</button>
+                    <div class='w-full flex justify-between my-1'>
+                        <button class='bg-pink-300 hover:brightness-90 text-sm px-8' onclick={shufflePlayerDefinitions}>Stokka</button>
+                        <button class='bg-pink-300 hover:brightness-90 text-sm px-8' onclick={() => modals.open(ScoreBoardModal)}>Staðan</button>
+                    </div>
                 </div>
-
                 <div class='w-full flex flex-col items-center'>
                     <LoadingIndicator bind:isLoading={$isLoading} />
                     <p class='text-amber-400 min-h-6 py-2 text-center'>{$errMessage}</p>
@@ -195,7 +198,7 @@
                         {:else}
                             <button onclick={toggleSubmissions} class='rounded-r-none w-1/3 flex justify-center'><img src={padlock} width="25" height="25" alt="padlock"></button>
                         {/if}
-                        <button onclick={setScores} class='rounded-none border-x border-slate-400 grow'>Stig</button>
+                        <button onclick={setScores} class='rounded-none border-x border-slate-400 grow'>Gefa stig</button>
                         <button onclick={nextRound} class='rounded-l-none font-bold w-1/3 flex justify-center'><img src={next} alt="next" width="25"></button>
                     </div>
                 </div>
@@ -209,10 +212,10 @@
                         <p class='text-xl'>{$game.currentWord.word}</p>
                     {/if}
                     {#if $game.mySubmittedDefinition}
-                        <div class='bg-slate-200 rounded-xl w-full py-1 px-2 my-1 text-center text-slate-600' in:slide|global>
+                        <button onclick={() => {myDefinition = $game.mySubmittedDefinition}} class='bg-slate-200 rounded-xl w-full py-1 px-2 my-1 text-center text-slate-600' in:slide|global>
                             <p class='font-semibold text-sm'>Mín skýring</p>
                             <p>{$game.mySubmittedDefinition}</p>
-                        </div>
+                        </button>
                     {/if}
                 </div>
                 <div class='flex flex-col w-full overflow-auto'>

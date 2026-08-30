@@ -39,6 +39,7 @@
     async function save() {
         isLoading = true
         errMessage = ''
+        if(playerPoints.map(pp => pp.points).every(val => val == 0)) close(players)
         for(let p of playerPoints){
             let player = players.find(player => player.name == p.playerName)
             if(player){
